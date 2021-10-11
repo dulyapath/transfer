@@ -12,6 +12,8 @@
     String active = request.getAttribute("active").toString();
     String user_code = session.getAttribute("user").toString();
     String is_direct = session.getAttribute("is_direct").toString();
+    String is_del_history = session.getAttribute("is_del_history").toString();
+
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,8 +39,7 @@
         <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="${sublink}css/select2-bootstrap.css">
         <link rel="stylesheet" href="${sublink}css/sweetalert.css">
-        <%
-            if (css.size() > 0) {
+        <%            if (css.size() > 0) {
                 for (int i = 0; i < css.size(); i++) {
                     out.print("<link rel=\"stylesheet\" href=\"" + css.get(i).toString() + v + "\">");
                 }
@@ -155,9 +156,17 @@
                         <span>เบิกออก(ไม่มีใบขอเบิก)</span></a>
                 </li>
                 <% }
-                    }
-
-                    if (active == "report") { %>
+                    }%>
+                <% if (active == "cancelsend") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}transsend/cancel.jsp">
+                        <i class="fas fa-file"></i>
+                        <span>ยกเลิกใบเบิก</span></a>
+                </li>
+                <%   if (active == "report") { %>
                 <li class="nav-item active">
                     <% } else { %>
                 <li class="nav-item ">
@@ -166,12 +175,52 @@
                         <i class="fas fa-file"></i>
                         <span>รายงานสถานะ</span></a>
                 </li>
+                <% if (active == "historysend") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}historysend/index.jsp">
+                        <i class="fas fa-file"></i>
+                        <span>ประวัติการเบิกสินค้า</span></a>
+                </li>
+                <% if (active == "historyrefund") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}historyrefund/index.jsp">
+                        <i class="fas fa-file"></i>
+                        <span>ประวัติการรับคืนสินค้า</span></a>
+                </li>
                 <!-- Divider -->
                 <hr class="sidebar-divider">
-
-
+                <% if (active == "reportrequestsend") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}reportrequestsend/index.jsp">
+                        <i class="fas fa-file"></i>
+                        <span>รายงานขอเบิก-เบิกสินค้า</span></a>
+                </li>
 
                 <%
+
+                    if (is_del_history != null || user_code.equals("SUPERADMIN")) {
+                        if (is_del_history.equals("1") || user_code.equals("SUPERADMIN")) {
+                            if (active == "historydel") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}historydel/index.jsp">
+                        <i class="fas fa-file-export"></i>
+                        <span>ประวัติการลบ</span></a>
+                </li>
+                <% }
+                    }
+
                     if (user_code.toUpperCase().equals("SUPERADMIN")) {
                         if (active == "store") { %>
                 <li class="nav-item active">
@@ -181,6 +230,17 @@
                     <a class="nav-link" href="${sublink}storage/index.jsp">
                         <i class="fas fa-store"></i>
                         <span>กำหนดคลัง</span></a>
+                </li>
+                <%}
+                    if (user_code.toUpperCase().equals("SUPERADMIN")) {
+                        if (active == "setting") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}setting/index.jsp">
+                        <i class="fas fa-store"></i>
+                        <span>กำหนดค่าเริ่มต้น</span></a>
                 </li>
                 <%}%>
                 <!-- Nav Item - Tables -->

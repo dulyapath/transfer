@@ -79,6 +79,16 @@ public class getUserStorage extends HttpServlet {
                 obj.put("rev_shelf_code", __rsHead.getString("rev_shelf_code"));
                 obj.put("is_direct", __rsHead.getString("is_direct"));
 
+                obj.put("defualt_branch_code", __rsHead.getString("defualt_branch_code"));
+                obj.put("defualt_wh_code", __rsHead.getString("defualt_wh_code"));
+                obj.put("defualt_shelf_code", __rsHead.getString("defualt_shelf_code"));
+
+                obj.put("defualt_to_branch_code", __rsHead.getString("defualt_to_branch_code"));
+                obj.put("defualt_to_wh_code", __rsHead.getString("defualt_to_wh_code"));
+                obj.put("defualt_to_shelf_code", __rsHead.getString("defualt_to_shelf_code"));
+
+                obj.put("is_del_history", __rsHead.getString("is_del_history"));
+
                 _sess.setAttribute("wh_code", __rsHead.getString("wh_code"));
                 _sess.setAttribute("shelf_code", __rsHead.getString("shelf_code"));
                 _sess.setAttribute("branch_code", __rsHead.getString("branch_code"));
@@ -89,6 +99,20 @@ public class getUserStorage extends HttpServlet {
                 _sess.setAttribute("rev_wh_code", __rsHead.getString("rev_wh_code"));
                 _sess.setAttribute("rev_shelf_code", __rsHead.getString("rev_shelf_code"));
                 _sess.setAttribute("is_direct", __rsHead.getString("is_direct"));
+
+                _sess.setAttribute("defualt_branch_code", __rsHead.getString("defualt_branch_code"));
+                _sess.setAttribute("defualt_wh_code", __rsHead.getString("defualt_wh_code"));
+                _sess.setAttribute("defualt_shelf_code", __rsHead.getString("defualt_shelf_code"));
+
+                _sess.setAttribute("defualt_to_branch_code", __rsHead.getString("defualt_to_branch_code"));
+                _sess.setAttribute("defualt_to_wh_code", __rsHead.getString("defualt_to_wh_code"));
+                _sess.setAttribute("defualt_to_shelf_code", __rsHead.getString("defualt_to_shelf_code"));
+
+                _sess.setAttribute("defualt_direct_branch_code", __rsHead.getString("defualt_direct_branch_code"));
+                _sess.setAttribute("defualt_direct_wh_code", __rsHead.getString("defualt_direct_wh_code"));
+                _sess.setAttribute("defualt_direct_shelf_code", __rsHead.getString("defualt_direct_shelf_code"));
+
+                _sess.setAttribute("is_del_history", __rsHead.getString("is_del_history"));
 
                 jsarr.put(obj);
             }

@@ -48,7 +48,7 @@ public class getDocSendDirect extends HttpServlet {
         String __whcode = _sess.getAttribute("wh_code").toString();
         String __shcode = _sess.getAttribute("shelf_code").toString();
         String __bhcode = _sess.getAttribute("branch_code").toString();
-        
+
         String[] whList = __whcode.split(",");
         String _whList = "";
         System.out.println("whList.length " + whList.length);
@@ -97,12 +97,19 @@ public class getDocSendDirect extends HttpServlet {
             _bhList += "'" + __bhcode + "'";
         }
 
-        if (!request.getParameter("search").equals("")) {
-            search = " and doc_no like '%" + request.getParameter("search") + "%' or user_code  like '%" + request.getParameter("search") + "%'  ";
-        }
         String from_date = "";
         if (!request.getParameter("fd").equals("")) {
             from_date = " and doc_date between '" + request.getParameter("fd") + "' and '" + request.getParameter("td") + "' ";
+        }
+
+        if (!request.getParameter("search").equals("")) {
+            from_date = "";
+            search = " and doc_no like '%" + request.getParameter("search").trim() + "%' "
+                    + "or wid_doc like '%" + request.getParameter("search").trim() + "%' "
+                    + "or fg_doc like '%" + request.getParameter("search").trim() + "%' "
+                    + "or rim_doc like '%" + request.getParameter("search").trim() + "%' "
+                    + "or user_code  like '%" + request.getParameter("search").trim() + "%' "
+                    + "or remark like '%" + request.getParameter("search").trim() + "%' ";
         }
         JSONArray jsarr = new JSONArray();
 
@@ -115,7 +122,7 @@ public class getDocSendDirect extends HttpServlet {
             String _code = "";
             String _name = "";
 
-            String query1 = "select * from (select *,to_char(doc_date,'DD/MM/YYYY') as doc_datex,to_char(doc_time,'HH:MM') as doc_timex,COALESCE((select name_1 from ic_warehouse where ic_warehouse.code = wh_code),'')as wh_name,COALESCE((select name_1 from ic_warehouse where ic_warehouse.code = to_wh_code),'')as to_wh_name,COALESCE((select name_1 from ic_shelf where ic_shelf.code = shelf_code and ic_shelf.whcode = wh_code),'')as shelf_name,COALESCE((select name_1 from ic_shelf where ic_shelf.code = to_shelf_code and ic_shelf.whcode = to_wh_code),'')as to_sh_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = branch_code),'')as branch_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = to_branch_code),'')as to_branch_name,COALESCE((select name_1 from erp_user where erp_user.code = user_code),'')as user_name from ic_transfer_doc_temp where to_branch_code in (" + _bhList + ") and to_wh_code in (" + _whList + ") and to_shelf_code in (" + _shList + ") and status in (2,6) and is_direct = 1 order by create_datetime desc) as temp where 1=1 " + from_date + search + " limit 50 ";
+            String query1 = "select * from (select *,to_char(doc_date,'DD/MM/YYYY') as doc_datex,to_char(doc_time,'HH24:MI') as doc_timex,COALESCE((select name_1 from ic_warehouse where ic_warehouse.code = wh_code),'')as wh_name,COALESCE((select name_1 from ic_warehouse where ic_warehouse.code = to_wh_code),'')as to_wh_name,COALESCE((select name_1 from ic_shelf where ic_shelf.code = shelf_code and ic_shelf.whcode = wh_code),'')as shelf_name,COALESCE((select name_1 from ic_shelf where ic_shelf.code = to_shelf_code and ic_shelf.whcode = to_wh_code),'')as to_sh_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = branch_code),'')as branch_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = to_branch_code),'')as to_branch_name,COALESCE((select name_1 from erp_user where erp_user.code = user_code),'')as user_name from ic_transfer_doc_temp where to_branch_code in (" + _bhList + ") and to_wh_code in (" + _whList + ") and shelf_code in (" + _shList + ") and status in (2,6) and is_direct = 1 order by create_datetime desc) as temp where 1=1 " + from_date + search + " limit 50 ";
             System.out.println("query1 " + query1);
             PreparedStatement __stmt = __conn.prepareStatement(query1, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ResultSet __rsHead = __stmt.executeQuery();
@@ -131,7 +138,7 @@ public class getDocSendDirect extends HttpServlet {
 
                 obj.put("doc_no", __rsHead.getString("doc_no"));
                 obj.put("doc_date", __rsHead.getString("doc_datex"));
-                obj.put("doc_time", __rsHead.getString("doc_timex"));
+                obj.put("doc_time", __rsHead.getString("doc_time"));
                 obj.put("user_code", __rsHead.getString("user_code"));
                 obj.put("user_name", __rsHead.getString("user_name"));
                 obj.put("branch_code", __rsHead.getString("branch_code"));
@@ -142,9 +149,8 @@ public class getDocSendDirect extends HttpServlet {
                 obj.put("to_shelf_code", __rsHead.getString("to_shelf_code"));
                 obj.put("remark", __rsHead.getString("remark"));
                 obj.put("status", __rsHead.getString("status"));
-                
-                                
-                 obj.put("to_wh_name", __rsHead.getString("to_wh_name"));
+
+                obj.put("to_wh_name", __rsHead.getString("to_wh_name"));
                 obj.put("branch_name", __rsHead.getString("branch_name"));
                 obj.put("wh_name", __rsHead.getString("wh_name"));
                 obj.put("shelf_name", __rsHead.getString("shelf_name"));

@@ -153,6 +153,11 @@
 <input type="hidden" value="<%=_sess.getAttribute("user")%>" id="userlogin">
 <input type="hidden" value="<%=session.getAttribute("user")%>" id="user_code">
 <input type="hidden" value="<%=session.getAttribute("branch_code")%>" id="user_branch">
+
+<input type="hidden" value="<%=session.getAttribute("defualt_direct_branch_code")%>" id="session_direct_branch_code">
+<input type="hidden" value="<%=session.getAttribute("defualt_direct_wh_code")%>" id="session_direct_wh_code">
+<input type="hidden" value="<%=session.getAttribute("defualt_direct_shelf_code")%>" id="session_direct_shelf_code">
+
 <input type="hidden" value="${user_name}" id="user_namex">
 <input type="hidden" id="hSubLink" value="${sublink}">
 
@@ -246,8 +251,12 @@
                 </div>
                 <hr style="margin-bottom: 10px;margin-top: 15px;" class="btn-addline">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-2">
                         <button class="btn btn-sm btn-success btn-addline" onclick="_addLine()">เพิ่มรายการสินค้า</button>
+                    </div>
+
+                    <div class="col-4">
+                        <input type="text" class="form-control form-control-sm" placeholder="รหัสสินค้า..." id="inp-scanner">
                     </div>
                 </div>
 

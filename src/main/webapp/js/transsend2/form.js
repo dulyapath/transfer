@@ -22,19 +22,27 @@ function removeCommas(str) {
 }
 
 
+var send_instock = "0";
 
-var item_detail = [
-    {
-        item_code: '',
-        item_name: '',
-        unit_code: '',
-        balance: 0.0,
-        average_cost: 0.0,
-        qty: 0.0
-    }
-]
+var item_detail = []
 
 $(document).ready(function () {
+
+    $.ajax({
+        url: serverURL + 'getSetting',
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+            console.log(res);
+            if (res.length > 0) {
+                send_instock = res[0].send_instock;
+            }
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+
     _getWhList();
     _getBranchList();
     _getToWhList()
@@ -58,7 +66,73 @@ $(document).ready(function () {
         $('#doc_date').val(currentdate.getFullYear() + '-' + ('0' + (currentdate.getMonth() + 1)).slice(-2) + '-' + ('0' + currentdate.getDate()).slice(-2));
         $('#remark').val('');
     }
+    $('#inp-scanner').keyup(function (e) {
+        if (e.keyCode == 13)
+        {
+            var data = $('#inp-scanner').val().trim();
+            if (data != '') {
+                var row = item_detail.filter(
+                        c => c.item_code == data
+                );
 
+                if (row.length == 0) {
+
+                    var from_bh = $('#from_bh').val();
+                    var from_wh = $('#from_wh').val();
+                    var from_sh = $('#from_sh').val();
+                    var to_bh = $('#to_bh').val();
+                    var to_wh = $('#to_wh').val();
+                    var msg = '';
+                    if (from_bh == '') {
+                        msg += 'สาขา \n'
+                    }
+                    if (from_wh == '') {
+                        msg += 'คลัง \n'
+                    }
+                    if (from_sh == '') {
+                        msg += 'ที่เก็บ \n'
+                    }
+                    if (msg != "") {
+                        swal("กรุณาเลือก " + msg, "", "warning")
+                    } else {
+
+                        $.ajax({
+                            url: serverURL + 'getItemScan?code=' + data,
+                            method: 'GET',
+                            cache: false,
+                            success: function (res) {
+                                console.log(res)
+                                if (res.length > 0) {
+
+                                    item_detail.push({
+                                        item_code: res[0].item_code,
+                                        item_name: res[0].item_name,
+                                        unit_code: res[0].unit_code,
+                                        unit_name: res[0].unit_name,
+                                        balance: 0.0,
+                                        balance_qty: 0.0,
+                                        average_cost: 0.0,
+                                        price: 0.0,
+                                        qty: 1
+                                    });
+                                    _getCost((item_detail.length - 1), res[0].item_code, res[0].unit_code);
+                                    $('#inp-scanner').val('');
+                                } else {
+                                    swal("ไม่พบข้อมูลสินค้า", data, "warning")
+                                }
+
+                            },
+                            error: function (res) {
+                                console.log(res)
+                            },
+                        });
+                    }
+                } else {
+                    swal("พบสินค้าในรายการแล้ว", data, "warning")
+                }
+            }
+        }
+    });
 
     $('#btn_create').on('click', function () {
 
@@ -109,6 +183,7 @@ $(document).ready(function () {
         if (msg != '') {
             alert('กรุณาเพิ่ม \n' + msg)
         } else {
+            var checkqty = "";
             for (var i = 0; i < item_detail.length; i++) {
                 if (item_detail[i].item_code != '') {
                     var json_detail = {
@@ -123,10 +198,20 @@ $(document).ready(function () {
                         average_cost: item_detail[i].average_cost,
                         sum_of_cost: parseFloat(item_detail[i].average_cost) * parseFloat(item_detail[i].qty)
                     }
+                    console.log(item_detail[i].balance_qty,item_detail[i].qty)
+                    if (parseFloat(item_detail[i].balance_qty) < parseFloat(item_detail[i].qty)) {
+                        checkqty += "จำนวนสินค้าไม่เพียงพอ ";
+                    }
                     details.push(json_detail);
                 }
             }
-            console.log(details)
+            if (send_instock == '1') {
+                if (checkqty != '') {
+                    swal("ไม่สามารถทำรายการได้ " + checkqty, "", "warning");
+                    return;
+                }
+            }
+            console.log(send_instock)
             if (details.length > 0) {
                 var json_data = {
                     doc_no: doc_no,
@@ -278,6 +363,14 @@ $(document).ready(function () {
         }
     });
 
+
+    $('#to_bh').on('change', function () {
+        var data = $('#to_bh').val();
+        if (data != '') {
+            _getWarehouseShelf();
+
+        }
+    });
     $('#to_wh').on('change', function () {
         var data = $('#to_wh').val();
         if (data != '') {
@@ -321,43 +414,61 @@ $(document).ready(function () {
         var index = $('#line_index').val()
         var detail = $('#line_action').val()
 
-        item_detail[index].item_code = code;
-        item_detail[index].item_name = name;
-        $.ajax({
-            url: serverURL + 'unit_item?code=' + code,
-            method: 'GET',
-            cache: false,
-            success: function (res) {
+        var row = item_detail.filter(
+                c => c.item_code == code
+        );
 
-                console.log(res)
-                if (res.length == 1) {
-                    item_detail[index].unit_code = res[0].code;
-                    item_detail[index].unit_name = res[0].name_1;
-                    _getCost(index, code, res[0].code);
-                } else {
-                    var html = '';
-                    for (var i = 0; i < res.length; i++) {
-                        html += "<li class = 'list-group-item list-group-item-action select-unit' data-itemcode='" + code + "'  data-code='" + res[i].code + "' data-name='" + res[i].name_1 + "' > " + res[i].code + '~' + res[i].name_1 + " </li>"
+        if (row.length == 0) {
+
+            item_detail[index].item_code = code;
+            item_detail[index].item_name = name;
+            $.ajax({
+                url: serverURL + 'unit_item?code=' + code,
+                method: 'GET',
+                cache: false,
+                success: function (res) {
+
+                    console.log(res)
+                    if (res.length == 1) {
+                        item_detail[index].unit_code = res[0].code;
+                        item_detail[index].unit_name = res[0].name_1;
+                        _getCost(index, code, res[0].code);
+                    } else {
+                        var html = '';
+                        for (var i = 0; i < res.length; i++) {
+                            html += "<li class = 'list-group-item list-group-item-action select-unit' data-itemcode='" + code + "'  data-code='" + res[i].code + "' data-name='" + res[i].name_1 + "' > " + res[i].code + '~' + res[i].name_1 + " </li>"
+                        }
+                        $('#list_unit_item').html(html)
+                        $('#modalSearch').modal('hide')
+                        setTimeout(function () {
+                            $('#modalUnit').modal('show')
+                        }, 500);
                     }
-                    $('#list_unit_item').html(html)
-                    $('#modalSearch').modal('hide')
-                    setTimeout(function () {
-                        $('#modalUnit').modal('show')
-                    }, 500);
-                }
 
-            },
-            error: function (res) {
-                console.log(res)
-            },
-        });
+                },
+                error: function (res) {
+                    console.log(res)
+                },
+
+            });
+        } else {
+            swal("พบสินค้าในรายการแล้ว", code, "warning")
+        }
     });
 
     $(document).delegate('.qty_edit', 'input', function (event) {
 
         var index = $(this).attr('data-index')
         var data = $('.qty_value_' + index).val();
-        item_detail[index].qty = data
+
+
+        if (parseFloat(data) > 0) {
+            item_detail[index].qty = data
+        } else {
+            item_detail[index].qty = 1
+        }
+
+        $('.qty_value_' + index).val(item_detail[index].qty);
 
     });
 
@@ -523,7 +634,7 @@ function _getDocDetail(docno) {
 }
 
 function _getBranchList() {
-
+    var sess_branch = $('#session_direct_branch_code').val();
     var html = "";
     $.ajax({
         url: serverURL + 'getBranchListUser2',
@@ -543,6 +654,9 @@ function _getBranchList() {
                     $('#from_bh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        $('#from_bh').val(sess_branch).trigger('change');
+                    }, 500)
                 }, 500)
             }
 
@@ -575,6 +689,7 @@ function _getToBranchList() {
                     $('#to_bh').select2({
                         theme: 'bootstrap'
                     })
+
                 }, 500)
             }
 
@@ -587,7 +702,7 @@ function _getToBranchList() {
 }
 
 function _getWhList() {
-
+    var sess_wh = $('#session_direct_wh_code').val();
     var html = "";
     $.ajax({
         url: serverURL + 'getWhListUser2',
@@ -607,6 +722,9 @@ function _getWhList() {
                     $('#from_wh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        $('#from_wh').val(sess_wh).trigger('change');
+                    }, 500)
                 }, 500)
             }
 
@@ -652,6 +770,7 @@ function _getToWhList() {
 
 function _getShList() {
     var data = $('#from_wh').val();
+    var sess_sh = $('#session_direct_shelf_code').val();
     var html = "";
     $.ajax({
         url: serverURL + 'getShListUser2?whcode=' + data,
@@ -672,6 +791,9 @@ function _getShList() {
                     $('#from_sh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        $('#from_sh').val(sess_sh).trigger('change');
+                    }, 500)
                 }, 500)
             }
 
@@ -715,6 +837,37 @@ function _getShList2() {
         },
     });
 }
+
+function _getWarehouseShelf() {
+    var data = $('#to_bh').val();
+    var html = "";
+    $.ajax({
+        url: serverURL + 'getWarehouseShelf?bh=' + data,
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+
+            if (res.length > 0) {
+
+                res.forEach(function (ele, index) {
+                    $('#to_wh').val(ele.wh_code).trigger('change');
+                    setTimeout(function () {
+                        $('#to_sh').val('01').trigger('change');
+                    }, 700)
+
+                });
+
+
+            }
+
+
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+}
+
 
 function _getPriceformula(index, itemcode, unitcode) {
     var to_bh = $('#from_bh').val();
@@ -812,7 +965,7 @@ function _addLine() {
         item_name: '',
         unit_code: '',
         balance: 0.0,
-        qty: 0.0,
+        qty: 1,
         price: 0
     });
     _displayTable();
@@ -838,7 +991,7 @@ function _displayTable() {
         html += '<td class="text-center">' + item_detail[i].unit_code + '</td>'
         html += '<td class="text-right " >' + formatNumber(parseFloat(item_detail[i].balance_qty)) + '</td>'
         if (cmd_status == "6") {
-            html += '<td class="text-center" ><input type="number" style="text-align:center" class="qty_edit  qty_value_' + i + '" data-index="' + i + '" value="' + item_detail[i].qty + '"></td>'
+            html += '<td class="text-center" ><input type="number" style="text-align:center" class="qty_edit  qty_value_' + i + '" data-index="' + i + '" min="1" value="' + item_detail[i].qty + '"></td>'
 
         } else {
             html += '<td class="text-right" >' + item_detail[i].qty + '</td>'

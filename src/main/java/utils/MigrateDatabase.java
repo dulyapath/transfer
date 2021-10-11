@@ -40,13 +40,15 @@ public class MigrateDatabase {
         ICTransferDoc.addColumns(new MigrateColumnModel("to_wh_code", "character varying", 255));
         ICTransferDoc.addColumns(new MigrateColumnModel("to_shelf_code", "character varying", 255));
         ICTransferDoc.addColumns(new MigrateColumnModel("to_branch_code", "character varying", 255));
-        ICTransferDoc.addColumns(new MigrateColumnModel("remark", "character varying", 255));
+        ICTransferDoc.addColumns(new MigrateColumnModel("remark", "text"));
         ICTransferDoc.addColumns(new MigrateColumnModel("status", "smallint", "DEFAULT 0"));
         ICTransferDoc.addColumns(new MigrateColumnModel("price_formula", "smallint", "DEFAULT 0"));
         ICTransferDoc.addColumns(new MigrateColumnModel("wid_doc", "character varying", 255));
         ICTransferDoc.addColumns(new MigrateColumnModel("fg_doc", "character varying", 255));
         ICTransferDoc.addColumns(new MigrateColumnModel("rim_doc", "character varying", 255));
         ICTransferDoc.addColumns(new MigrateColumnModel("is_direct", "numeric", "DEFAULT 0"));
+        ICTransferDoc.addColumns(new MigrateColumnModel("is_print", "numeric", "DEFAULT 0"));
+        ICTransferDoc.addColumns(new MigrateColumnModel("is_trans_send", "numeric", "DEFAULT 0"));
         ICTransferDoc.addColumns(new MigrateColumnModel("create_datetime", "timestamp without time zone", "DEFAULT now()"));
 
         ICTransferDoc.addConstraint("ic_transfer_doc_temp_pk PRIMARY KEY (doc_no)");
@@ -81,7 +83,21 @@ public class MigrateDatabase {
         ICWareHouse.addColumns(new MigrateColumnModel("rev_branch_code", "text"));
         ICWareHouse.addColumns(new MigrateColumnModel("rev_wh_code", "text"));
         ICWareHouse.addColumns(new MigrateColumnModel("rev_shelf_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_branch_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_wh_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_shelf_code", "text"));
+
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_direct_branch_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_direct_wh_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_direct_shelf_code", "text"));
+
         ICWareHouse.addColumns(new MigrateColumnModel("is_direct", "smallint", "DEFAULT 0"));
+        ICWareHouse.addColumns(new MigrateColumnModel("is_del_history", "smallint", "DEFAULT 0"));
+
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_to_branch_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_to_wh_code", "text"));
+        ICWareHouse.addColumns(new MigrateColumnModel("defualt_to_shelf_code", "text"));
+
         ICWareHouse.addColumns(new MigrateColumnModel("create_datetime", "timestamp without time zone", "DEFAULT now()"));
         ICWareHouse.addConstraint("erp_user_storage_pk PRIMARY KEY (emp_code)");
         tables.add(ICWareHouse);
@@ -145,6 +161,27 @@ public class MigrateDatabase {
         ICTransferTransDetail.addColumns(new MigrateColumnModel("create_datetime", "timestamp without time zone", "DEFAULT now()"));
         ICTransferTransDetail.addConstraint("ic_transfer_trans_detail_temp_pk PRIMARY KEY (roworder)");
         tables.add(ICTransferTransDetail);
+
+        MigrateTableModel ICTransferLog = new MigrateTableModel("ic_transfer_log");
+        ICTransferLog.addColumns(new MigrateColumnModel("roworder", "serial", "NOT NULL"));
+        ICTransferLog.addColumns(new MigrateColumnModel("doc_no", "character varying", 255, "NOT NULL"));
+        ICTransferLog.addColumns(new MigrateColumnModel("wid_doc", "character varying", 255));
+        ICTransferLog.addColumns(new MigrateColumnModel("approve_code", "character varying", 255));
+        ICTransferLog.addColumns(new MigrateColumnModel("screen", "numeric", "DEFAULT 0"));
+        ICTransferLog.addColumns(new MigrateColumnModel("create_datetime", "timestamp without time zone", "DEFAULT now()"));
+        ICTransferLog.addConstraint("ic_transfer_log_pk PRIMARY KEY (roworder)");
+        tables.add(ICTransferLog);
+
+        MigrateTableModel ICTransferSetting = new MigrateTableModel("ic_transfer_setting");
+        ICTransferSetting.addColumns(new MigrateColumnModel("roworder", "serial", "NOT NULL"));
+        ICTransferSetting.addColumns(new MigrateColumnModel("code", "character varying", 255));
+        ICTransferSetting.addColumns(new MigrateColumnModel("send_instock", "numeric", "DEFAULT 0"));
+        ICTransferSetting.addColumns(new MigrateColumnModel("show_balance", "numeric", "DEFAULT 0"));
+        ICTransferSetting.addColumns(new MigrateColumnModel("create_datetime", "timestamp without time zone", "DEFAULT now()"));
+        ICTransferSetting.addConstraint("ic_transfer_setting_pk PRIMARY KEY (roworder)");
+        ICTransferSetting.addAfterScript("INSERT INTO ic_transfer_setting (code,send_instock,show_balance) VALUES ('S0001',0,0)");
+        tables.add(ICTransferSetting);
+
     }
 
     public void verify(String provider, String dbname, HttpSession session) {

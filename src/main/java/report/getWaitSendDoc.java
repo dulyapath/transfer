@@ -115,7 +115,7 @@ public class getWaitSendDoc extends HttpServlet {
             String _code = "";
             String _name = "";
 
-            String query1 = "select * from (select *,to_char(doc_date,'DD/MM/YYYY') as doc_datex,to_char(doc_time,'HH:MM') as doc_timex,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = branch_code),'')as branch_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = to_branch_code),'')as to_branch_name,COALESCE((select name_1 from erp_user where erp_user.code = user_code),'')as user_name from ic_transfer_doc_temp where to_branch_code in (" + _bhList + ") and to_wh_code in (" + _whList + ") and to_shelf_code in (" + _shList + ") and status in (1) order by create_datetime desc) as temp where 1=1 " + search;
+            String query1 = "select * from (select *,to_char(doc_date,'DD/MM/YYYY') as doc_datex,to_char(doc_time,'HH24:MI') as doc_timex,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = branch_code),'')as branch_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = to_branch_code),'')as to_branch_name,COALESCE((select name_1 from erp_user where erp_user.code = user_code),'')as user_name from ic_transfer_doc_temp where to_branch_code in (" + _bhList + ") and to_wh_code in (" + _whList + ") and to_shelf_code in (" + _shList + ") and status in (1) order by create_datetime desc) as temp where 1=1 " + search;
             System.out.println("query1 " + query1);
             PreparedStatement __stmt = __conn.prepareStatement(query1, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ResultSet __rsHead = __stmt.executeQuery();

@@ -159,11 +159,15 @@ public class saveDocWid extends HttpServlet {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                sum_amount += Double.parseDouble(obj.get("sum_of_cost").toString());
+
                 _update_price.append("update ic_transfer_detail_temp set receive_qty= " + obj.get("event_qty") + " ,event_qty = " + obj.get("event_qty") + " ,average_cost = " + obj.get("average_cost") + " , wid_balance=" + obj.get("balance_qty") + " where doc_no='" + __doc_no + "' and item_code='" + obj.get("item_code") + "' and unit_code='" + obj.get("unit_code") + "';");
-                _insert_trans_sale_details_temp.append("insert into ic_trans_detail (trans_type,trans_flag,doc_date,doc_time,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,average_cost,sum_of_cost,stand_value,divide_value,ratio,calc_flag) values "
-                        + "(3,56,'" + __wid_doc_date + "','" + __wid_doc_time + "','" + __wid_doc_no + "','" + obj.get("item_code") + "','" + obj.get("item_name") + "','" + obj.get("unit_code") + "','" + obj.get("line_number") + "','" + obj.get("event_qty") + "','" + __from_bh + "','" + __from_wh + "','" + __from_sh + "','" + obj.get("average_cost") + "','" + obj.get("sum_of_cost") + "',"
-                        + "(select stand_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select divide_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select ratio from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),'-1');");
+                if (Double.parseDouble(obj.get("event_qty").toString()) > 0) {
+                    sum_amount += Double.parseDouble(obj.get("sum_of_cost").toString());
+                    _insert_trans_sale_details_temp.append("insert into ic_trans_detail (trans_type,trans_flag,doc_date,doc_time,doc_time_calc,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,average_cost,sum_of_cost,stand_value,divide_value,ratio,calc_flag) values "
+                            + "(3,56,'" + __wid_doc_date + "','" + __wid_doc_time + "','" + __wid_doc_time + "','" + __wid_doc_no + "','" + obj.get("item_code") + "','" + obj.get("item_name") + "','" + obj.get("unit_code") + "','" + obj.get("line_number") + "','" + obj.get("event_qty") + "','" + __from_bh + "','" + __from_wh + "','" + __from_sh + "','" + obj.get("average_cost") + "','" + obj.get("sum_of_cost") + "',"
+                            + "(select stand_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select divide_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select ratio from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),'-1');");
+                }
+
             }
             _insert_trans_sale_temp.append("insert into ic_trans (trans_type,trans_flag,doc_date,doc_no,doc_time,branch_code,wh_from,location_from,doc_format_code,creator_code,last_editor_code,remark,total_amount) "
                     + "values (3,56,'" + __wid_doc_date + "','" + __wid_doc_no + "','" + __wid_doc_time + "','" + __from_bh + "','" + __from_wh + "','" + __from_sh + "','MWID','" + __user + "','" + __user + "','" + __wid_remark + "'," + sum_amount + ");");

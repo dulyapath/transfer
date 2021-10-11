@@ -92,15 +92,37 @@ public class ajaxlogincontroller extends HttpServlet {
 
                     ResultSet __rs = __stmt.executeQuery();
                     while (__rs.next()) {
+
                         __pass = true;
 
                         __session.setAttribute("user", __userCode);
+
                         __session.setAttribute("perm", "1");
 
                         __session.setAttribute("provider", __providerCode.toLowerCase());
+
                         __session.setAttribute("user_name", __rs.getString("user_name"));
-                        __session.setAttribute("is_direct","0");
+
+                        __session.setAttribute("is_direct", "0");
+
+                        __session.setAttribute("is_del_history", "0");
+                        __session.setAttribute("defualt_shelf_code", "");
+                        __session.setAttribute("defualt_wh_code", "");
+                        __session.setAttribute("defualt_branch_code", "");
+
+                        __session.setAttribute("defualt_to_shelf_code", "");
+                        __session.setAttribute("defualt_to_wh_code", "");
+                        __session.setAttribute("defualt_to_branch_code", "");
+
+                        __session.setAttribute("defualt_direct_branch_code", "");
+                        __session.setAttribute("defualt_direct_wh_code", "");
+                        __session.setAttribute("defualt_direct_shelf_code", "");
+
+                        __session.setAttribute("send_instock", "0");
+                        __session.setAttribute("show_balance", "0");
+
                         __session.setMaxInactiveInterval(30 * 60);
+
                     }
                     __rs.close();
                     __stmt.close();
@@ -133,7 +155,6 @@ public class ajaxlogincontroller extends HttpServlet {
                     __html = __html.append("<table class='table table-bordered' width='100%' >");
                     Connection __conn = __routine._connect(__providerDatabaseName);
                     String __query = "select data_code from sml_database_list where upper(data_code) in (select upper(data_code) from sml_database_list_user_and_group where user_or_group_status=0 and upper(user_or_group_code)=?) or upper(data_code) in (select upper(data_code) from sml_database_list_user_and_group where user_or_group_status=1 and upper(user_or_group_code) in (select upper(group_code) from sml_user_and_group where upper(user_code)=?)) order by data_name";
-                    // "select data_code from sml_database_list_user_and_group where upper(user_or_group_code)='" + __userCode + "' and user_or_group_status=0";
                     PreparedStatement __stmt = __conn.prepareStatement(__query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
                     __stmt.setString(1, __userCode);
                     __stmt.setString(2, __userCode);

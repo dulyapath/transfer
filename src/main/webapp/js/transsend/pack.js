@@ -22,7 +22,7 @@ function removeCommas(str) {
 }
 
 
-
+var send_instock = "0";
 var item_detail = [
     {
         item_code: '',
@@ -34,6 +34,22 @@ var item_detail = [
 ]
 
 $(document).ready(function () {
+
+    $.ajax({
+        url: serverURL + 'getSetting',
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+            console.log(res);
+            if (res.length > 0) {
+                send_instock = res[0].send_instock;
+            }
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+
     _getWhList();
     _getBranchList();
     var currentdate = new Date();
@@ -55,7 +71,14 @@ $(document).ready(function () {
     $('#btn_create').on('click', function () {
 
         var currentdate = new Date();
-        var datetime = currentdate.getHours() + ':' + currentdate.getMinutes();
+        var dateString =
+                ("0" + currentdate.getHours()).slice(-2) + ":" +
+                ("0" + currentdate.getMinutes()).slice(-2) + ":" +
+                ("0" + currentdate.getSeconds()).slice(-2);
+
+
+        var datetime = dateString.split(':')[0] + ":" + dateString.split(':')[1]
+
 
         var doc_no = $('#rt_doc_no').val();
         var doc_date = $('#rt_doc_date').val()
@@ -85,6 +108,7 @@ $(document).ready(function () {
         if (msg != '') {
             alert('กรุณาเพิ่ม \n' + msg)
         } else {
+            var checkqty = "";
             for (var i = 0; i < item_detail.length; i++) {
                 if (item_detail[i].item_code != '') {
                     var json_detail = {
@@ -99,10 +123,20 @@ $(document).ready(function () {
                         average_cost: item_detail[i].average_cost,
                         sum_of_cost: parseFloat(item_detail[i].average_cost) * parseFloat(item_detail[i].event_qty)
                     }
+
+                    if (parseFloat(item_detail[i].balance_qty) < parseFloat(item_detail[i].event_qty)) {
+                        checkqty += "จำนวนสินค้าไม่เพียงพอ ";
+                    }
                     details.push(json_detail);
                 }
             }
             console.log(details)
+            if (send_instock == '1') {
+                if (checkqty != '') {
+                    swal("ไม่สามารถทำรายการได้ " + checkqty, "", "warning");
+                    return;
+                }
+            }
             if (details.length > 0) {
                 var json_data = {
                     doc_no: doc_no,

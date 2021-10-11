@@ -187,7 +187,7 @@
 
                                 <div class="row">
                                     <div class="col-12">
-                                        <p ><b>เลขที่ใบเบิก</b> : <span id="doc_no"></span> <b style="margin-left:1.25em"> วันที่:</b> <span id="doc_date"></span> <b style="margin-left:1.25em">ผู้ขอ:</b> <span id="creator_code"></span></p>
+                                        <p ><b>เลขที่ใบขอเบิก</b> : <span id="doc_no"></span> <b style="margin-left:1.25em"> วันที่:</b> <span id="doc_date"></span> <b style="margin-left:1.25em">ผู้ขอ:</b> <span id="creator_code"></span></p>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -205,6 +205,13 @@
                                         <p ><b>หมายเหคุ:</b> <span id="remark"></span> </p>
                                     </div>
                                 </div>
+                                 <div class="row">
+                                    <div class="col-12">
+                                        <p ><b>เลขที่ใบเบิก</b> : <span id="doc_no_wid"></span> <b style="margin-left:1.25em"> วันที่:</b> <span id="doc_date_wid"></span><b style="margin-left:1.25em">หมายเหคุ:</b> <span id="remark_wid"></span></p>
+                                    </div>
+                                </div>
+
+                    
                                 <hr style="margin-bottom: 10px;margin-top: 15px;">
                                 <h4>รับสินค้า</h4>
                                 <div class="row">

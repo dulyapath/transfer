@@ -123,6 +123,7 @@ public class saveDocFg extends HttpServlet {
         String __to_wh = request.getParameter("to_wh");
         String __to_sh = request.getParameter("to_sh");
 
+        String wid_doc = request.getParameter("wid_doc");
         String __wid_doc_no = request.getParameter("wid_docno");
         String __wid_doc_date = request.getParameter("wid_docdate");
         String __wid_remark = request.getParameter("wid_remark");
@@ -151,21 +152,24 @@ public class saveDocFg extends HttpServlet {
             int row = __rsHead.getRow();
             //System.out.println("row " + row);
             if (row > 0) {
-                 PreparedStatement __stmt_delete = __conn.prepareStatement("update ic_transfer_doc_temp set status=4 , fg_doc = '" + __wid_doc_no + "' where doc_no = '" + __doc_no + "';");
+                PreparedStatement __stmt_delete = __conn.prepareStatement("update ic_transfer_doc_temp set status=4 , fg_doc = '" + __wid_doc_no + "' where doc_no = '" + __doc_no + "';");
                 __stmt_delete.executeUpdate();
                 __stmt_delete.close();
             }
             Double sum_amount = 0.0;
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                sum_amount += Double.parseDouble(obj.get("sum_of_cost").toString());
+
                 _update_price.append("update ic_transfer_detail_temp set receive_qty = " + obj.get("receive_qty") + " where doc_no='" + __doc_no + "' and item_code='" + obj.get("item_code") + "' and unit_code='" + obj.get("unit_code") + "';");
-                _insert_trans_sale_details_temp.append("insert into ic_trans_detail (trans_type,trans_flag,doc_date,doc_time,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,price,sum_amount,stand_value,divide_value,ratio,calc_flag) values "
-                        + "(3,60,'" + __wid_doc_date + "','" + __wid_doc_time + "','" + __wid_doc_no + "','" + obj.get("item_code") + "','" + obj.get("item_name") + "','" + obj.get("unit_code") + "','" + obj.get("line_number") + "','" + obj.get("receive_qty") + "','" + __to_bh + "','" + __to_wh + "','" + __to_sh + "','" + obj.get("average_cost") + "','" + obj.get("sum_of_cost") + "',"
-                        + "(select stand_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select divide_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select ratio from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),1);");
+                if (Double.parseDouble(obj.get("receive_qty").toString()) > 0) {
+                    sum_amount += Double.parseDouble(obj.get("sum_of_cost").toString());
+                    _insert_trans_sale_details_temp.append("insert into ic_trans_detail (trans_type,trans_flag,doc_date,doc_time,doc_time_calc,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,price,sum_amount,sum_amount_exclude_vat,stand_value,divide_value,ratio,calc_flag) values "
+                            + "(3,60,'" + __wid_doc_date + "','" + __wid_doc_time + "','" + __wid_doc_time + "','" + __wid_doc_no + "','" + obj.get("item_code") + "','" + obj.get("item_name") + "','" + obj.get("unit_code") + "','" + obj.get("line_number") + "','" + obj.get("receive_qty") + "','" + __to_bh + "','" + __to_wh + "','" + __to_sh + "','" + obj.get("average_cost") + "','" + obj.get("sum_of_cost") + "','" + obj.get("sum_of_cost") + "',"
+                            + "(select stand_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select divide_value from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),(select ratio from ic_unit_use where ic_code='" + obj.get("item_code") + "' and code='" + obj.get("unit_code") + "'),1);");
+                }
             }
-            _insert_trans_sale_temp.append("insert into ic_trans (trans_type,trans_flag,doc_date,doc_no,doc_time,branch_code,wh_from,location_from,doc_format_code,creator_code,last_editor_code,remark,total_amount) "
-                    + "values (3,60,'" + __wid_doc_date + "','" + __wid_doc_no + "','" + __wid_doc_time + "','" + __to_bh + "','" + __to_wh + "','" + __to_sh + "','MFG','" + __user + "','" + __user + "','" + __wid_remark + "'," + sum_amount + ")");
+            _insert_trans_sale_temp.append("insert into ic_trans (doc_ref,doc_ref_date,trans_type,trans_flag,doc_date,doc_no,doc_time,branch_code,wh_from,location_from,doc_format_code,creator_code,last_editor_code,remark,total_amount) "
+                    + "values ('" + wid_doc + "',(select doc_date from ic_trans where trans_flag = 56 and doc_no = 'MWID20219121539435F64'),3,60,'" + __wid_doc_date + "','" + __wid_doc_no + "','" + __wid_doc_time + "','" + __to_bh + "','" + __to_wh + "','" + __to_sh + "','MFG','" + __user + "','" + __user + "','" + __wid_remark + "'," + sum_amount + ")");
 
             System.out.println(_update_price.toString());
 
@@ -183,13 +187,13 @@ public class saveDocFg extends HttpServlet {
             __stmt_detail.executeUpdate();
             __stmt_detail.close();
             __conn.close();
+            response.getWriter().print("success");
 
         } catch (Exception e) {
             e.printStackTrace();
             response.getWriter().print(e);
         }
 
-        response.getWriter().print("success");
     }
 
 }

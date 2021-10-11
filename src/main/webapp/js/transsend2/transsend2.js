@@ -139,7 +139,7 @@ $(document).ready(function () {
                 .then((willDelete) => {
                     if (willDelete) {
                         $.ajax({
-                            url: serverURL + 'delDocRequest',
+                            url: serverURL + 'delDocSend',
                             method: 'POST',
                             data: {doc_no: code},
                             success: function (res) {
@@ -159,6 +159,12 @@ $(document).ready(function () {
         var code = $(this).attr('data-docno')
         var status = $(this).attr('data-status')
         window.location.href = "form.jsp?d=" + code + "&s=" + status
+    });
+
+    $(document).delegate('.copy_doc', 'click', function (event) {
+        var code = $(this).attr('data-docno')
+        var status = $(this).attr('data-status')
+        window.location.href = "copyform.jsp?d=" + code + "&s=6"
     });
 
 });
@@ -210,7 +216,8 @@ function _showListDetail(data) {
             statusText = "รอนุมัติ"
             color = "red";
         }
-
+        var doc_time_split = data[i].doc_time.split(':')
+        var _doc_time = doc_time_split[0] + ":" + doc_time_split[1]
         html += `    <div class="card-body">
                 <div class="row">
                     <div class="col-6">
@@ -224,7 +231,7 @@ function _showListDetail(data) {
                         <div class="text-body text-left">วันที่ : ${data[i].doc_date}</div>
                     </div>
                     <div class="col-4">
-                        <div class="text-body text-left">เวลา : ${data[i].doc_time}</div>
+                        <div class="text-body text-left">เวลา : ${_doc_time}</div>
                     </div>
                     <div class="col-4">
                         <div class="text-body text-left">ผู้ขอ :  ${data[i].user_code}~${data[i].user_name}</div>
@@ -281,6 +288,12 @@ function _showListDetail(data) {
                             </span>
                             <span class="text">พิมพ์เอกสาร</span>
                         </button>`
+            html += ` <button  class="btn btn-primary btn-icon-split copy_doc" data-status="${data[i].status}" data-docno="${data[i].doc_no}">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-copy"></i>
+                            </span>
+                            <span class="text">คัดลอกเอกสาร</span>
+                        </button>`
             html += `  <button  class="btn btn-danger btn-icon-split del_doc" data-docno="${data[i].doc_no}">
                             <span class="icon text-white-50">
                                 <i class="fas fa-trash"></i>
@@ -312,6 +325,12 @@ function _showListDetail(data) {
                                 <i class="fas fa-print"></i>
                             </span>
                             <span class="text">พิมพ์เอกสาร</span>
+                        </button>`
+            html += ` <button  class="btn btn-primary btn-icon-split copy_doc" data-status="${data[i].status}" data-docno="${data[i].doc_no}">
+                            <span class="icon text-white-50">
+                                <i class="fas fa-copy"></i>
+                            </span>
+                            <span class="text">คัดลอกเอกสาร</span>
                         </button>`
         } else if (data[i].status == "3") {
             html += `<button class="btn btn-success btn-icon-split send_approve" data-docno="${data[i].doc_no}">

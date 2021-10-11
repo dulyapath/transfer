@@ -135,8 +135,8 @@ public class approveRefund extends HttpServlet {
             if (row > 0) {
 
                 Double sum_amount = 0.0;
-                _insert_trans_sale_details_temp.append("insert into ic_trans_detail (ref_doc_no,trans_type,trans_flag,doc_date,doc_time,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,price,sum_amount,stand_value,divide_value,ratio,calc_flag)  "
-                        + " select ref_doc_no,trans_type,trans_flag,doc_date,doc_time,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,price,sum_amount,stand_value,divide_value,ratio,calc_flag from ic_transfer_trans_detail_temp where doc_no = '" + __doc_no + "'");
+                _insert_trans_sale_details_temp.append("insert into ic_trans_detail (ref_doc_no,trans_type,trans_flag,doc_date,doc_time,doc_time_calc,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,price,sum_amount,stand_value,divide_value,ratio,calc_flag)  "
+                        + " select ref_doc_no,trans_type,trans_flag,doc_date,doc_time,doc_time,doc_no,item_code,item_name,unit_code,line_number,qty,branch_code,wh_code,shelf_code,price,sum_amount,stand_value,divide_value,ratio,calc_flag from ic_transfer_trans_detail_temp where doc_no = '" + __doc_no + "'");
 
                 _update_price.append("insert into ic_trans (trans_type,trans_flag,doc_date,doc_no,doc_time,branch_code,wh_from,location_from,doc_format_code,creator_code,last_editor_code,remark,total_amount) "
                         + " select trans_type,trans_flag,doc_date,doc_no,doc_time,branch_code,wh_from,location_from,doc_format_code,creator_code,last_editor_code,remark,total_amount from ic_transfer_trans_temp  where doc_no = '" + __doc_no + "'");

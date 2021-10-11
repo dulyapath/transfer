@@ -71,13 +71,77 @@
 
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12" >
+                    <div class="col-md-4" >
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" value="" id="is_direct">
                             <label class="form-check-label" for="is_direct">
                                 <b>สามารถใช้เบิกออก(ไม่มีใบขอเบิก)</b>
                             </label>
                         </div>
+                    </div>
+                    <div class="col-md-4" >
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="is_del_history">
+                            <label class="form-check-label" for="is_del_history">
+                                <b>สามารถเข้าดูประวัติการลบได้</b>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row" style="margin-top:5px">
+                    <div class="col-md-12">
+                        <h6>ค่าเริ่มต้นขอเบิก</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <label >สาขา</label>
+                        <select class="form-control branch_select" id="defualt_branch_code" style="width: 100%"></select>
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <label >คลัง</label>
+                        <select class="form-control defualt_wh_code" id="defualt_wh_code"  style="width: 100%"></select>
+                    </div>
+                    <div class="col-md-4" >
+                        <label >ที่เก็บ</label>
+                        <select class="form-control defualt_shelf_code" id="defualt_shelf_code"  style="width: 100%" disabled></select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <h6>ค่าเริ่มต้นรับเข้า</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <label >สาขา</label>
+                        <select class="form-control branch_select" id="defualt_to_branch_code" style="width: 100%"></select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label >คลัง</label>
+                        <select class="form-control defualt_to_wh_code" id="defualt_to_wh_code"  style="width: 100%"></select>
+                    </div>
+                    <div class="col-md-4" >
+                        <label >ที่เก็บ</label>
+                        <select class="form-control defualt_to_shelf_code" id="defualt_to_shelf_code"  style="width: 100%" disabled></select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:10px">
+                    <div class="col-md-12">
+                        <h6>ค่าเริ่มต้นเบิกออก(ไม่มีใบขอเบิก)</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <label >สาขา</label>
+                        <select class="form-control branch_select" id="defualt_direct_branch_code" style="width: 100%"></select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label >คลัง</label>
+                        <select class="form-control defualt_direct_wh_code" id="defualt_direct_wh_code"  style="width: 100%"></select>
+                    </div>
+                    <div class="col-md-4" >
+                        <label >ที่เก็บ</label>
+                        <select class="form-control defualt_direct_shelf_code" id="defualt_direct_shelf_code"  style="width: 100%" disabled></select>
                     </div>
                 </div>
                 <hr>

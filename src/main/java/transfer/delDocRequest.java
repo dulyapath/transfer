@@ -112,24 +112,21 @@ public class delDocRequest extends HttpServlet {
 
         String __doc_no = request.getParameter("doc_no");
 
-
-
         HttpSession session = request.getSession(true);
 
-
         StringBuilder _insert_trans_sale_temp = new StringBuilder();
-        StringBuilder _update_price = new StringBuilder();
-        StringBuilder _insert_trans_sale_details_temp = new StringBuilder();
+
+        StringBuilder _insert_trans_log = new StringBuilder();
         _routine __routine = new _routine();
         StringBuilder __result = new StringBuilder();
 
         try {
             Connection __conn = __routine._connect(__dbname, _global.FILE_CONFIG(__provider));
-            _insert_trans_sale_temp.append("delete from ic_transfer_doc_temp where doc_no = '" + __doc_no + "';delete from ic_transfer_detail_temp where doc_no = '" + __doc_no + "'");
-
+            _insert_trans_sale_temp.append("delete from ic_transfer_doc_temp where doc_no = '" + __doc_no + "';delete from ic_transfer_detail_temp where doc_no = '" + __doc_no + "';");
+            _insert_trans_sale_temp.append("insert into ic_transfer_log (doc_no,wid_doc,approve_code,screen) values ('"+__doc_no+"','','"+__user+"','0');");
             PreparedStatement __stmt_trans = __conn.prepareStatement(_insert_trans_sale_temp.toString());
 
-            System.out.println(__stmt_trans);
+            System.out.println(_insert_trans_sale_temp);
 
             __stmt_trans.executeUpdate();
             __stmt_trans.close();

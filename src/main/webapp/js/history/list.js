@@ -200,6 +200,8 @@ function _showListDetail(data) {
         if (data[i].wid_doc == undefined) {
             data[i].wid_doc = "";
         }
+        var doc_time_split = data[i].doc_time.split(':')
+        var _doc_time = doc_time_split[0] + ":" + doc_time_split[1]
         html += `    <div class="card-body">
                 <div class="row">
                     <div class="col-12">
@@ -213,7 +215,7 @@ function _showListDetail(data) {
                         <div class="text-body text-left">วันที่ : ${data[i].doc_date}</div>
                     </div>
                     <div class="col-4">
-                        <div class="text-body text-left">เวลา : ${data[i].doc_time}</div>
+                        <div class="text-body text-left">เวลา : ${_doc_time}</div>
                     </div>
                     <div class="col-4">
                         <div class="text-body text-left">ผู้ขอ :  ${data[i].user_code}~${data[i].user_name}</div>
@@ -254,7 +256,10 @@ function _showListDetail(data) {
                     </div>  </div>`
         }
         html += `    <div class="row" style="margin-top: 0.5rem;">
-                        <div class="col-12">
+           <div class="col-6">
+                            <div class="text-body text-left">ผู้รับ : ${data[i].fg_user_code}~${data[i].fg_user_name}</div>
+                        </div> 
+                        <div class="col-6">
                             <div class="text-body text-left">หมายเหตุ : ${data[i].remark}</div>
                         </div> 
                     </div>

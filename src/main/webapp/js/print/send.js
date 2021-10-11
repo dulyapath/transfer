@@ -5,7 +5,7 @@ $(document).ready(function () {
 
     var doc_no = $('#doc_no').val()
     $.ajax({
-        url: '../getShowDocSendDetail?docno=' + doc_no,
+        url: '../getShowDocSendDetailReport?docno=' + doc_no,
         method: 'GET',
         success: function (res) {
 
@@ -43,7 +43,7 @@ $(document).ready(function () {
                     __rsHTML += "<p>เลขที่เอกสาร: " + res[0].wid_doc + "</p>";
                     __rsHTML += "</div>";
                     __rsHTML += "<div class='col-sm-6 '>";
-                    __rsHTML += "<p class='text-right'>วันที่: " + res[0].wid_date + " เวลา: " + res[0].doc_time + " | หน้า" + (_loop + 1) + "/" + _totalPage + "</p>";
+                    __rsHTML += "<p class='text-right'>วันที่: " + res[0].wid_date + " เวลา: " + res[0].wid_time + " | หน้า" + (_loop + 1) + "/" + _totalPage + "</p>";
                     __rsHTML += "</div>";
                     __rsHTML += "</div>";
                     __rsHTML += "<div class='row' style='font-size: 18px;'>";
@@ -89,7 +89,8 @@ $(document).ready(function () {
                     console.log(_perLoop)
                     var total = 0;
                     for (var i = _loopRowCount; i < _perLoop; i++) {
-                        total += parseFloat(res[0].detail[i].price) * parseFloat(res[0].detail[i].qty);
+                        total += parseFloat(res[0].detail[i].price) * parseFloat(res[0].detail[i].event_qty);
+
                         __rsHTML += '<tr>'
                         __rsHTML += '<td class="text-center">' + (i + 1) + '</td>'
                         __rsHTML += '<td nowrap class="text-left ">' + res[0].detail[i].item_code + '</td>'
@@ -102,10 +103,12 @@ $(document).ready(function () {
                             res[0].detail[i].price = '0';
                         }
                         __rsHTML += '<td class="text-right">' + formatNumber(parseFloat(res[0].detail[i].price)) + '</td>'
-                        __rsHTML += '<td class="text-right" style="font-weight:bold">' + formatNumber(parseFloat(res[0].detail[i].price) * parseFloat(res[0].detail[i].qty)) + '</td>'
+                        __rsHTML += '<td class="text-right" style="font-weight:bold">' + formatNumber(parseFloat(res[0].detail[i].price) * parseFloat(res[0].detail[i].event_qty)) + '</td>'
                         __rsHTML += '</tr>'
                         _loopRowCount++;
+
                     }
+
                     __rsHTML += `</tbody>`;
                     __rsHTML += `<tfoot>
                                  <tr>
@@ -133,15 +136,15 @@ $(document).ready(function () {
                         <p>ลงชื่อ..........................ผู้อนุมัติ</p>
                         <p>(....................................)</p>
                     </div>
-
+ </div>
                 </div>`
 
 
                     $("#content-list").html(__rsHTML);
                     // _displayTable(res[0].detail)
                     setTimeout(function () {
-                        window.print();
-                        window.close();
+                         window.print();
+                         window.close();
                     }, 2000);
                 }
             }

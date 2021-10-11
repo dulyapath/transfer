@@ -26,7 +26,7 @@
     <div class="col-md-4">
         <label>ค้นหา</label>
         <div class="input-group mb-3">
-            <input type="text" class="form-control" id="search_name" placeholder="เลขที่เอกสาร,ผู้ขอ...." >
+            <input type="text" class="form-control" id="search_name" placeholder="ค้นหา...." >
 
         </div>
     </div>

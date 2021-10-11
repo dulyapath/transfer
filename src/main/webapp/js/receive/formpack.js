@@ -34,8 +34,8 @@ var item_detail = [
 ]
 
 $(document).ready(function () {
-    _getWhList();
-    _getBranchList();
+    // _getWhList();
+    // _getBranchList();
 
     var cmd_mode = $('#form-mode').val();
     cmd_status = $('#form-status').val();
@@ -51,7 +51,13 @@ $(document).ready(function () {
     $('#btn_create').on('click', function () {
 
         var currentdate = new Date();
-        var datetime = currentdate.getHours() + ':' + currentdate.getMinutes();
+        var dateString =
+                ("0" + currentdate.getHours()).slice(-2) + ":" +
+                ("0" + currentdate.getMinutes()).slice(-2) + ":" +
+                ("0" + currentdate.getSeconds()).slice(-2);
+
+
+        var datetime = dateString.split(':')[0] + ":" + dateString.split(':')[1]
 
         var doc_no = $('#rt_doc_no').val();
         var doc_date = $('#rt_doc_date').val()
@@ -620,7 +626,7 @@ function _displayTable() {
 
         html += '<td class="text-center">' + item_detail[i].unit_code + '</td>'
         html += '<td class="text-right" >' + item_detail[i].qty + '</td>'
-      //  html += '<td class="text-right " >' + formatNumber(parseFloat(item_detail[i].balance_qty)) + '</td>'
+        //  html += '<td class="text-right " >' + formatNumber(parseFloat(item_detail[i].balance_qty)) + '</td>'
 
         html += '<td class="text-center" >' + formatNumber(parseFloat(item_detail[i].event_qty)) + '</td>'
 

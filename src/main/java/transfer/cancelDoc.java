@@ -123,7 +123,8 @@ public class cancelDoc extends HttpServlet {
 
         try {
             Connection __conn = __routine._connect(__dbname, _global.FILE_CONFIG(__provider));
-            _insert_trans_sale_temp.append("update ic_transfer_doc_temp set status = 2 where doc_no = '" + __doc_no + "';update ic_trans set last_status = 1 where trans_flag = 60 and doc_no = '" + __fg + "';");
+            _insert_trans_sale_temp.append("update ic_transfer_doc_temp set status = 2,fg_doc = '' where doc_no = '" + __doc_no + "';update ic_trans set last_status = 1 where trans_flag = 60 and doc_no = '" + __fg + "';"
+                    + "update ic_trans_detail set last_status = 1 where trans_flag = 60 and doc_no = '" + __fg + "';");
 
             PreparedStatement __stmt_trans = __conn.prepareStatement(_insert_trans_sale_temp.toString());
 

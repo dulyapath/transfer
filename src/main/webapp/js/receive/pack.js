@@ -36,8 +36,8 @@ var item_detail = [
 var rim_date = {};
 var mrt_date = {};
 $(document).ready(function () {
-    _getWhList();
-    _getBranchList();
+    //_getWhList();
+    //_getBranchList();
 
     var cmd_mode = $('#form-mode').val();
     cmd_status = $('#form-status').val();
@@ -81,7 +81,7 @@ $(document).ready(function () {
         var datetimec = 'MRT' + currentdate.getFullYear() + '' + (currentdate.getMonth() + 1) + '' + currentdate.getDate() + '' + currentdate.getHours() + '' + currentdate.getMinutes() + '' + currentdate.getSeconds() + '' + uuidv4().toUpperCase()
         mrt_date.doc_no = datetimec;
         $.ajax({
-            url: serverURL + 'saveDocRequestReceive',
+            url: serverURL + 'saveDocRequestReceive2',
             method: 'POST',
             data: mrt_date,
             success: function (res) {
@@ -101,7 +101,14 @@ $(document).ready(function () {
     $('#btn_create').on('click', function () {
 
         var currentdate = new Date();
-        var datetime = currentdate.getHours() + ':' + currentdate.getMinutes();
+        var dateString =
+                ("0" + currentdate.getHours()).slice(-2) + ":" +
+                ("0" + currentdate.getMinutes()).slice(-2) + ":" +
+                ("0" + currentdate.getSeconds()).slice(-2);
+
+
+        var datetime = dateString.split(':')[0] + ":" + dateString.split(':')[1]
+
         var doc_no = $('#rt_doc_no').val();
         var doc_date = $('#rt_doc_date').val()
         var remark = $('#rt_remark').val();
@@ -160,6 +167,7 @@ $(document).ready(function () {
                     to_wh: to_wh,
                     to_sh: to_sh,
                     wid_docno: wid_docno,
+                    wid_doc: wid_doc,
                     wid_docdate: wid_docdate,
                     wid_remark: wid_remark,
                     wid_doctime: datetime,
@@ -199,12 +207,13 @@ $(document).ready(function () {
 
                         setTimeout(function () {
                             if (json_new.length > 0) {
+
                                 window.open('print.jsp' + "?docno=" + doc_no, "_blank");
                                 swal("สร้างใบรับสินค้าสำเร็จ เอกสารเลขที่ " + wid_docno + " สำเร็จ", "", "success").then((value) => {
                                     var json_data_rim = {
                                         doc_no: "",
                                         doc_date: currentdate.getFullYear() + '-' + ('0' + (currentdate.getMonth() + 1)).slice(-2) + '-' + ('0' + currentdate.getDate()).slice(-2),
-                                        doc_time: currentdate.getHours() + ':' + currentdate.getMinutes(),
+                                        doc_time: dateString.split(':')[0] + ":" + dateString.split(':')[1],
                                         remark: remark + ' สร้างจาก ' + doc_no,
                                         user_code: user_code,
                                         from_bh: from_bh,
@@ -222,6 +231,7 @@ $(document).ready(function () {
 
                                     var json_data_mrt = {
                                         doc_no: "",
+                                        wid_doc: wid_doc,
                                         doc_date: currentdate.getFullYear() + '-' + ('0' + (currentdate.getMonth() + 1)).slice(-2) + '-' + ('0' + currentdate.getDate()).slice(-2),
                                         rt_doc: doc_no,
                                         remark: remark + ' สร้างจาก ' + doc_no,
@@ -350,7 +360,15 @@ $(document).ready(function () {
 
         var index = $(this).attr('data-index')
         var data = $('.qty_value_' + index).val();
-        item_detail[index].receive_qty = data
+        //console.log(data)
+        if (parseFloat(data) > parseFloat(item_detail[index].event_qty)) {
+            item_detail[index].receive_qty = item_detail[index].event_qty
+        } else {
+            item_detail[index].receive_qty = data
+        }
+        //console.log(item_detail[index].receive_qty)
+        $('.qty_value_' + index).val(item_detail[index].receive_qty);
+
 
     });
     $(document).delegate('.select-unit', 'click', function (event) {
@@ -406,6 +424,10 @@ function _getDocDetail(docno) {
                 $('#doc_no').text(res[0].doc_no);
                 $('#doc_date').text(res[0].doc_date);
                 $('#creator_code').text(res[0].user_code + '~' + res[0].user_name)
+
+                $('#doc_no_wid').text(res[0].wid_doc);
+                $('#doc_date_wid').text(res[0].wid_datex);
+                $('#remark_wid').text(res[0].wid_remark);
 
 
                 $('#remark').text(res[0].remark);
@@ -634,22 +656,25 @@ function _displayTable() {
     var html = '';
     for (var i = 0; i < item_detail.length; i++) {
 
-
-        html += '<tr>'
-        html += '<td class="text-center">' + (i + 1) + '</td>'
-
-        html += '<td class="text-left "  >' + item_detail[i].item_code + ' </td>'
+        if (parseFloat(item_detail[i].event_qty) > 0) {
 
 
-        html += '<td class="text-left">' + item_detail[i].item_name + '</td>'
+            html += '<tr>'
+            html += '<td class="text-center">' + (i + 1) + '</td>'
 
-        html += '<td class="text-center">' + item_detail[i].unit_code + '</td>'
-        html += '<td class="text-right" >' + item_detail[i].event_qty + '</td>'
-        html += '<td class="text-center" ><input type="number" style="text-align:center" class="qty_edit  qty_value_' + i + '" data-index="' + i + '" value="' + item_detail[i].receive_qty + '"></td>'
-        html += '<td class="text-center"></td>'
+            html += '<td class="text-left "  >' + item_detail[i].item_code + ' </td>'
 
 
-        html += '</tr>'
+            html += '<td class="text-left">' + item_detail[i].item_name + '</td>'
+
+            html += '<td class="text-center">' + item_detail[i].unit_code + '</td>'
+            html += '<td class="text-right" >' + item_detail[i].event_qty + '</td>'
+            html += '<td class="text-center" ><input type="number" style="text-align:center" class="qty_edit  qty_value_' + i + '" data-index="' + i + '" value="' + item_detail[i].receive_qty + '"></td>'
+            html += '<td class="text-center"></td>'
+
+
+            html += '</tr>'
+        }
     }
 
     $('#item_detail').html(html);

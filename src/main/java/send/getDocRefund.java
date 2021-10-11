@@ -98,12 +98,16 @@ public class getDocRefund extends HttpServlet {
             _bhList += "'" + __bhcode + "'";
         }
 
-        if (!request.getParameter("search").equals("")) {
-            search = " and doc_no like '%" + request.getParameter("search") + "%' or creator_code  like '%" + request.getParameter("search") + "%'  ";
-        }
         String from_date = "";
         if (!request.getParameter("fd").equals("")) {
             from_date = " and doc_date between '" + request.getParameter("fd") + "' and '" + request.getParameter("td") + "' ";
+        }
+        if (!request.getParameter("search").equals("")) {
+            from_date = "";
+            search = " and doc_no like '%" + request.getParameter("search").trim() + "%' "
+
+                    + "or creator_code  like '%" + request.getParameter("search").trim() + "%' "
+                    + "or remark like '%" + request.getParameter("search").trim() + "%' ";
         }
         JSONArray jsarr = new JSONArray();
 
@@ -116,7 +120,7 @@ public class getDocRefund extends HttpServlet {
             String _code = "";
             String _name = "";
 
-            String query1 = "select * from (select *,to_char(doc_date,'DD/MM/YYYY') as doc_datex,doc_time as doc_timex,COALESCE((select name_1 from ic_warehouse where ic_warehouse.code = wh_from),'')as wh_name,COALESCE((select name_1 from ic_shelf where ic_shelf.code = location_from and ic_shelf.whcode = wh_from),'')as shelf_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = branch_code),'')as branch_name,COALESCE((select name_1 from erp_user where erp_user.code = creator_code),'')as user_name from ic_transfer_trans_temp where branch_code in (" + _bhList + ") and wh_from in (" + _whList + ") and location_from in (" + _shList + ") order by create_datetime desc) as temp where 1=1 " + from_date + search +" limit 50"; 
+            String query1 = "select * from (select *,to_char(doc_date,'DD/MM/YYYY') as doc_datex,doc_time as doc_timex,COALESCE((select name_1 from ic_warehouse where ic_warehouse.code = wh_from),'')as wh_name,COALESCE((select name_1 from ic_shelf where ic_shelf.code = location_from and ic_shelf.whcode = wh_from),'')as shelf_name,COALESCE((select name_1 from erp_branch_list where erp_branch_list.code = branch_code),'')as branch_name,COALESCE((select name_1 from erp_user where erp_user.code = creator_code),'')as user_name from ic_transfer_trans_temp where doc_format_code = 'MRIM' and branch_code in (" + _bhList + ") and wh_from in (" + _whList + ") and location_from in (" + _shList + ") order by create_datetime desc) as temp where 1=1 " + from_date + search + " limit 50";
             System.out.println("query1 " + query1);
             PreparedStatement __stmt = __conn.prepareStatement(query1, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ResultSet __rsHead = __stmt.executeQuery();
@@ -132,7 +136,7 @@ public class getDocRefund extends HttpServlet {
 
                 obj.put("doc_no", __rsHead.getString("doc_no"));
                 obj.put("doc_date", __rsHead.getString("doc_datex"));
-                obj.put("doc_time", __rsHead.getString("doc_timex"));
+                obj.put("doc_time", __rsHead.getString("doc_time"));
                 obj.put("user_code", __rsHead.getString("creator_code"));
                 obj.put("user_name", __rsHead.getString("user_name"));
                 obj.put("branch_code", __rsHead.getString("branch_code"));
@@ -143,7 +147,7 @@ public class getDocRefund extends HttpServlet {
                 obj.put("branch_name", __rsHead.getString("branch_name"));
                 obj.put("wh_name", __rsHead.getString("wh_name"));
                 obj.put("shelf_name", __rsHead.getString("shelf_name"));
-                
+
                 jsarr.put(obj);
             }
 

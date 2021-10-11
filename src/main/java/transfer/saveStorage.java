@@ -78,6 +78,16 @@ public class saveStorage extends HttpServlet {
                 obj.put("rev_wh_code", __rsHead.getString("rev_wh_code"));
                 obj.put("rev_shelf_code", __rsHead.getString("rev_shelf_code"));
                 obj.put("is_direct", __rsHead.getString("is_direct"));
+                obj.put("defualt_branch_code", __rsHead.getString("defualt_branch_code"));
+                obj.put("defualt_wh_code", __rsHead.getString("defualt_wh_code"));
+                obj.put("defualt_shelf_code", __rsHead.getString("defualt_shelf_code"));
+                obj.put("defualt_to_branch_code", __rsHead.getString("defualt_to_branch_code"));
+                obj.put("defualt_to_wh_code", __rsHead.getString("defualt_to_wh_code"));
+                obj.put("defualt_to_shelf_code", __rsHead.getString("defualt_to_shelf_code"));
+                obj.put("defualt_direct_branch_code", __rsHead.getString("defualt_direct_branch_code"));
+                obj.put("defualt_direct_wh_code", __rsHead.getString("defualt_direct_wh_code"));
+                obj.put("defualt_direct_shelf_code", __rsHead.getString("defualt_direct_shelf_code"));
+                obj.put("is_del_history", __rsHead.getString("is_del_history"));
                 jsarr.put(obj);
             }
 
@@ -130,6 +140,18 @@ public class saveStorage extends HttpServlet {
         String __rev_sh_code = request.getParameter("rev_shcode");
         String __rev_branch_code = request.getParameter("rev_branchcode");
         String __is_direct = request.getParameter("is_direct");
+        String is_del_history = request.getParameter("is_del_history");
+        String defualt_branch_code = request.getParameter("defualt_branch_code");
+        String defualt_wh_code = request.getParameter("defualt_wh_code");
+        String defualt_shelf_code = request.getParameter("defualt_shelf_code");
+
+        String defualt_to_branch_code = request.getParameter("defualt_to_branch_code");
+        String defualt_to_wh_code = request.getParameter("defualt_to_wh_code");
+        String defualt_to_shelf_code = request.getParameter("defualt_to_shelf_code");
+
+        String defualt_direct_branch_code = request.getParameter("defualt_direct_branch_code");
+        String defualt_direct_wh_code = request.getParameter("defualt_direct_wh_code");
+        String defualt_direct_shelf_code = request.getParameter("defualt_direct_shelf_code");
         System.out.println("__wh_code " + __wh_code);
 
         HttpSession session = request.getSession(true);
@@ -150,12 +172,12 @@ public class saveStorage extends HttpServlet {
             int row = __rsHead.getRow();
             //System.out.println("row " + row);
             if (row > 0) {
-                PreparedStatement __stmt_update = __conn.prepareStatement("update erp_user_storage set is_direct = '" + __is_direct + "',branch_code='" + __branch_code + "',wh_code='" + __wh_code + "',shelf_code='" + __sh_code + "' ,to_branch_code='" + __to_branch_code + "',to_wh_code = '" + __to_wh_code + "' ,to_shelf_code = '" + __to_sh_code + "',rev_branch_code='" + __rev_branch_code + "',rev_wh_code = '" + __rev_wh_code + "' ,rev_shelf_code = '" + __rev_sh_code + "' where emp_code = '" + __emp_code + "';");
+                PreparedStatement __stmt_update = __conn.prepareStatement("update erp_user_storage set defualt_direct_shelf_code='" + defualt_direct_shelf_code + "' ,defualt_direct_wh_code='" + defualt_direct_wh_code + "' ,defualt_direct_branch_code='" + defualt_direct_branch_code + "' ,defualt_to_shelf_code='" + defualt_to_shelf_code + "' ,defualt_to_wh_code='" + defualt_to_wh_code + "',defualt_to_branch_code='" + defualt_to_branch_code + "',defualt_shelf_code='" + defualt_shelf_code + "' ,defualt_wh_code='" + defualt_wh_code + "',defualt_branch_code='" + defualt_branch_code + "',is_del_history='" + is_del_history + "',is_direct = '" + __is_direct + "',branch_code='" + __branch_code + "',wh_code='" + __wh_code + "',shelf_code='" + __sh_code + "' ,to_branch_code='" + __to_branch_code + "',to_wh_code = '" + __to_wh_code + "' ,to_shelf_code = '" + __to_sh_code + "',rev_branch_code='" + __rev_branch_code + "',rev_wh_code = '" + __rev_wh_code + "' ,rev_shelf_code = '" + __rev_sh_code + "' where emp_code = '" + __emp_code + "';");
                 __stmt_update.executeUpdate();
                 __stmt_update.close();
             } else {
-                _insert_trans.append("insert into erp_user_storage (emp_code,branch_code,wh_code,shelf_code,to_branch_code,to_wh_code,to_shelf_code,rev_branch_code,rev_wh_code,rev_shelf_code,is_direct) "
-                        + "values ('" + __emp_code + "','" + __branch_code + "','" + __wh_code + "','" + __sh_code + "','" + __to_branch_code + "','" + __to_wh_code + "','" + __to_sh_code + "','" + __rev_branch_code + "','" + __rev_wh_code + "','" + __rev_sh_code + "','" + __is_direct + "');");
+                _insert_trans.append("insert into erp_user_storage (defualt_direct_shelf_code,defualt_direct_wh_code,defualt_direct_branch_code,defualt_to_shelf_code,defualt_to_wh_code,defualt_to_branch_code,defualt_shelf_code,defualt_wh_code,defualt_branch_code,is_del_history,emp_code,branch_code,wh_code,shelf_code,to_branch_code,to_wh_code,to_shelf_code,rev_branch_code,rev_wh_code,rev_shelf_code,is_direct) "
+                        + "values ('" + defualt_direct_shelf_code + "','" + defualt_direct_wh_code + "','" + defualt_direct_branch_code + "','" + defualt_to_shelf_code + "','" + defualt_to_wh_code + "','" + defualt_to_branch_code + "','" + defualt_shelf_code + "','" + defualt_wh_code + "','" + defualt_branch_code + "','" + is_del_history + "','" + __emp_code + "','" + __branch_code + "','" + __wh_code + "','" + __sh_code + "','" + __to_branch_code + "','" + __to_wh_code + "','" + __to_sh_code + "','" + __rev_branch_code + "','" + __rev_wh_code + "','" + __rev_sh_code + "','" + __is_direct + "');");
 
             }
 

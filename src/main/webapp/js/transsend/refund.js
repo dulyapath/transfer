@@ -220,7 +220,8 @@ function _showListDetail(data) {
             statusText = "ไม่อนุมัติ"
             color = "red";
         }
-
+        var doc_time_split = data[i].doc_time.split(':')
+        var _doc_time = doc_time_split[0] + ":" + doc_time_split[1]
         html += `    <div class="card-body">
                 <div class="row">
                     <div class="col-12">
@@ -234,7 +235,7 @@ function _showListDetail(data) {
                         <div class="text-body text-left">วันที่ : ${data[i].doc_date}</div>
                     </div>
                     <div class="col-4">
-                        <div class="text-body text-left">เวลา : ${data[i].doc_time}</div>
+                        <div class="text-body text-left">เวลา : ${_doc_time}</div>
                     </div>
                     <div class="col-4">
                         <div class="text-body text-left">ผู้ขอ :  ${data[i].user_code}~${data[i].user_name}</div>

@@ -59,12 +59,30 @@ $(document).ready(function () {
         var rev_whcode = $('#rev_wh').val();
         var rev_shcode = $('#rev_sh').val();
         var empcode = $('#emp_code').val();
+        var defualt_branch_code = $('#defualt_branch_code').val();
+        var defualt_wh_code = $('#defualt_wh_code').val();
+        var defualt_shelf_code = $('#defualt_shelf_code').val();
+        var defualt_to_branch_code = $('#defualt_to_branch_code').val();
+        var defualt_to_wh_code = $('#defualt_to_wh_code').val();
+        var defualt_to_shelf_code = $('#defualt_to_shelf_code').val();
+
+        var defualt_direct_branch_code = $('#defualt_direct_branch_code').val();
+        var defualt_direct_wh_code = $('#defualt_direct_wh_code').val();
+        var defualt_direct_shelf_code = $('#defualt_direct_shelf_code').val();
+
         var is_direct = "0";
         if ($('#is_direct').is(":checked"))
         {
             is_direct = "1"
         } else {
             is_direct = "0"
+        }
+        var is_del_history = "0";
+        if ($('#is_del_history').is(":checked"))
+        {
+            is_del_history = "1"
+        } else {
+            is_del_history = "0"
         }
         if (branchcode.length > 0 && shcode.length > 0 && whcode.length > 0 & to_branchcode.length > 0 && to_whcode.length > 0 && to_shcode.length > 0 && rev_branchcode.length > 0 && rev_whcode.length > 0 && rev_shcode.length) {
             var json_data = {
@@ -78,7 +96,20 @@ $(document).ready(function () {
                 rev_whcode: rev_whcode.toString(),
                 rev_shcode: rev_shcode.toString(),
                 rev_branchcode: rev_branchcode.toString(),
-                is_direct: is_direct
+                is_direct: is_direct,
+                defualt_branch_code: defualt_branch_code,
+                defualt_wh_code: defualt_wh_code,
+                defualt_shelf_code: defualt_shelf_code,
+                defualt_to_branch_code: defualt_to_branch_code,
+                defualt_direct_wh_code: defualt_direct_wh_code,
+                defualt_to_shelf_code: defualt_to_shelf_code,
+
+                defualt_direct_branch_code: defualt_direct_branch_code,
+                defualt_to_wh_code: defualt_to_wh_code,
+                defualt_direct_shelf_code: defualt_direct_shelf_code,
+
+                is_del_history: is_del_history
+
             }
             $.ajax({
                 url: serverURL + 'userStorage',
@@ -89,9 +120,11 @@ $(document).ready(function () {
                     swal("บันทึกข้อมูลสำเร็จ", "", "success")
                     _getUserList();
                     $('.branch_select').val('');
+                    $('.defualt_wh_code').val('');
                     $('.wh_select').val('');
                     $('.wh_select2').val('');
                     $('.wh_select3').val('');
+                    $('.defualt_shelf_code').val('');
                     $('.shelf_select').val('');
                     $('.shelf_select2').val('');
                     $('.shelf_select3').val('');
@@ -107,6 +140,47 @@ $(document).ready(function () {
             swal("กรุณากรอกข้อมูลให้ครบ", "", "warning")
         }
         console.log(shcode);
+    });
+
+
+
+    $('#defualt_wh_code').on('change', function () {
+        var data = $('#defualt_wh_code').val();
+        if (data != '') {
+            _getShList4();
+
+        } else {
+            // $('.shelf_select').select2().destroy();
+            $('#defualt_shelf_code').html('');
+            $('#defualt_shelf_code').val('').trigger('change');
+            $('#defualt_shelf_code').attr('disabled', 'true');
+        }
+    });
+
+    $('#defualt_to_wh_code').on('change', function () {
+        var data = $('#defualt_to_wh_code').val();
+        if (data != '') {
+            _getShList5();
+
+        } else {
+            // $('.shelf_select').select2().destroy();
+            $('#defualt_to_shelf_code').html('');
+            $('#defualt_to_shelf_code').val('').trigger('change');
+            $('#defualt_to_shelf_code').attr('disabled', 'true');
+        }
+    });
+    
+     $('#defualt_direct_wh_code').on('change', function () {
+        var data = $('#defualt_direct_wh_code').val();
+        if (data != '') {
+            _getShList6();
+
+        } else {
+            // $('.shelf_select').select2().destroy();
+            $('#defualt_direct_shelf_code').html('');
+            $('#defualt_direct_shelf_code').val('').trigger('change');
+            $('#defualt_direct_shelf_code').attr('disabled', 'true');
+        }
     });
 
     $('.wh_select').on('change', function () {
@@ -271,23 +345,50 @@ function _getEmpDetail(code) {
                     } else {
                         $("#is_direct").prop("checked", true);
                     }
+                    if (ele.is_del_history == '0') {
+                        $("#is_del_history").prop("checked", false);
+                    } else {
+                        $("#is_del_history").prop("checked", true);
+                    }
                     $('#from_bh').val(bh).trigger('change');
                     $('#from_wh').val(wh).trigger('change');
                     $('#to_bh').val(to_bh).trigger('change');
                     $('#to_wh').val(to_wh).trigger('change');
                     $('#rev_bh').val(rev_bh).trigger('change');
                     $('#rev_wh').val(rev_wh).trigger('change');
+
+                    $('#defualt_branch_code').val(ele.defualt_branch_code).trigger('change');
+                    $('#defualt_wh_code').val(ele.defualt_wh_code).trigger('change');
+
+                    $('#defualt_to_branch_code').val(ele.defualt_to_branch_code).trigger('change');
+                    $('#defualt_to_wh_code').val(ele.defualt_to_wh_code).trigger('change');
+
+
+                    $('#defualt_direct_branch_code').val(ele.defualt_direct_branch_code).trigger('change');
+                    $('#defualt_direct_wh_code').val(ele.defualt_direct_wh_code).trigger('change');
+
                     setTimeout(function () {
                         $('#from_sh').val(sh).trigger('change');
                         $('#to_sh').val(to_sh).trigger('change');
                         $('#rev_sh').val(rev_sh).trigger('change');
+                        $('#defualt_shelf_code').val(ele.defualt_shelf_code).trigger('change');
+                        $('#defualt_to_shelf_code').val(ele.defualt_to_shelf_code).trigger('change');
+                        $('#defualt_direct_shelf_code').val(ele.defualt_direct_shelf_code).trigger('change');
                     }, 1000);
-
                 });
-
+            } else {
+                $("#is_direct").prop("checked", false);
+                $("#is_del_history").prop("checked", false);
+                $('#defualt_branch_code').val('').trigger('change');
+                $('#defualt_wh_code').val('').trigger('change');
+                $('#defualt_shelf_code').val('').trigger('change');
+                $('#defualt_to_branch_code').val('').trigger('change');
+                $('#defualt_to_wh_code').val('').trigger('change');
+                $('#defualt_to_shelf_code').val('').trigger('change');
+                $('#defualt_direct_branch_code').val('').trigger('change');
+                $('#defualt_direct_wh_code').val('').trigger('change');
+                $('#defualt_direct_shelf_code').val('').trigger('change');
             }
-
-
         },
         error: function (res) {
             console.log(res)
@@ -299,6 +400,7 @@ function _getEmpDetail(code) {
 function _getWhList() {
 
     var html = "";
+
     $.ajax({
         url: serverURL + 'getWhList',
         method: 'GET',
@@ -318,6 +420,15 @@ function _getWhList() {
                 $('.wh_select2').select2();
                 $('.wh_select3').html(html);
                 $('.wh_select3').select2();
+                $('.defualt_wh_code').html(html);
+                $('.defualt_wh_code').select2();
+                $('.defualt_to_wh_code').html(html);
+                $('.defualt_to_wh_code').select2();
+                $('.defualt_direct_wh_code').html(html);
+                $('.defualt_direct_wh_code').select2();
+                _getShList4();
+                _getShList5();
+                _getShList6();
             }
 
 
@@ -377,6 +488,94 @@ function _getShList2() {
                 $('.shelf_select2').html(html);
                 $('.shelf_select2').removeAttr('disabled');
                 $('.shelf_select2').select2();
+            }
+
+
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+}
+
+
+function _getShList4() {
+    var data = $('#defualt_wh_code').val();
+    var html = "";
+    $.ajax({
+        url: serverURL + 'getShList?whcode=' + data,
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+
+            if (res.length > 0) {
+
+                res.forEach(function (ele, index) {
+                    html += `<option value='${ele.code}'>`;
+                    html += `${ele.code}~${ele.name_1}`;
+                    html += "</option>";
+                });
+                $('#defualt_shelf_code').html(html);
+                $('#defualt_shelf_code').removeAttr('disabled');
+                $('#defualt_shelf_code').select2();
+            }
+
+
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+}
+
+function _getShList5() {
+    var data = $('#defualt_to_wh_code').val();
+    var html = "";
+    $.ajax({
+        url: serverURL + 'getShList?whcode=' + data,
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+
+            if (res.length > 0) {
+
+                res.forEach(function (ele, index) {
+                    html += `<option value='${ele.code}'>`;
+                    html += `${ele.code}~${ele.name_1}`;
+                    html += "</option>";
+                });
+                $('#defualt_to_shelf_code').html(html);
+                $('#defualt_to_shelf_code').removeAttr('disabled');
+                $('#defualt_to_shelf_code').select2();
+            }
+
+
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+}
+
+function _getShList6() {
+    var data = $('#defualt_direct_wh_code').val();
+    var html = "";
+    $.ajax({
+        url: serverURL + 'getShList?whcode=' + data,
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+
+            if (res.length > 0) {
+
+                res.forEach(function (ele, index) {
+                    html += `<option value='${ele.code}'>`;
+                    html += `${ele.code}~${ele.name_1}`;
+                    html += "</option>";
+                });
+                $('#defualt_direct_shelf_code').html(html);
+                $('#defualt_direct_shelf_code').removeAttr('disabled');
+                $('#defualt_direct_shelf_code').select2();
             }
 
 

@@ -23,21 +23,33 @@ function removeCommas(str) {
 
 
 
-var item_detail = [
-    {
-        item_code: '',
-        item_name: '',
-        unit_code: '',
-        balance: 0.0,
-        qty: 0.0
-    }
-]
+var item_detail = []
+
+var show_balance = "0";
 
 $(document).ready(function () {
+
+    $.ajax({
+        url: serverURL + 'getSetting',
+        method: 'GET',
+        cache: false,
+        success: function (res) {
+            console.log(res);
+            if (res.length > 0) {
+                show_balance = res[0].show_balance;
+            }
+        },
+        error: function (res) {
+            console.log(res)
+        },
+    });
+
     _getWhList();
     _getBranchList();
     _getToWhList()
     _getToBranchList()
+
+
     var currentdate = new Date();
     var datetime = 'RT' + currentdate.getFullYear() + '' + (currentdate.getMonth() + 1) + '' + currentdate.getDate() + '' + currentdate.getHours() + '' + currentdate.getMinutes() + '' + currentdate.getSeconds() + '' + uuidv4().toUpperCase()
 
@@ -58,6 +70,108 @@ $(document).ready(function () {
 
 
 
+    $('#inp-scanner').keyup(function (e) {
+        if (e.keyCode == 13)
+        {
+            var data = $('#inp-scanner').val().trim();
+            if (data != '') {
+
+                var row = item_detail.filter(
+                        c => c.item_code == data
+                );
+
+                if (row.length == 0) {
+
+
+
+                    var from_bh = $('#from_bh').val();
+                    var from_wh = $('#from_wh').val();
+                    var from_sh = $('#from_sh').val();
+                    var to_bh = $('#to_bh').val();
+                    var to_wh = $('#to_wh').val();
+                    var to_sh = $('#to_sh').val();
+                    var msg = '';
+                    if (from_bh == '') {
+                        msg += 'สาขา \n'
+                    }
+                    if (from_wh == '') {
+                        msg += 'คลัง \n'
+                    }
+                    if (from_sh == '') {
+                        msg += 'ที่เก็บ \n'
+                    }
+
+                    if (msg != "") {
+                        swal("กรุณาเลือก " + msg, "", "warning")
+                    } else {
+
+                        $.ajax({
+                            url: serverURL + 'getItemScan?code=' + data,
+                            method: 'GET',
+                            cache: false,
+                            success: function (res) {
+                                console.log(res)
+                                if (res.length > 0) {
+
+                                    var to_bh = $('#from_bh').val();
+                                    var to_wh = $('#from_wh').val();
+                                    var to_sh = $('#from_sh').val();
+
+                                    $.ajax({
+                                        url: serverURL + 'getBalance?code=' + res[0].item_code + '&unit=' + res[0].unit_cost + '&whcode=' + to_wh + '&branch=' + to_bh,
+                                        method: 'GET',
+                                        cache: false,
+                                        success: function (resx) {
+
+                                            console.log(res)
+                                            if (resx.length == 1) {
+
+                                                item_detail.push({
+                                                    item_code: res[0].item_code,
+                                                    item_name: res[0].item_name,
+                                                    unit_code: res[0].unit_code,
+                                                    unit_name: res[0].unit_name,
+                                                    balance: resx[0].balance_qty,
+                                                    qty: 1
+                                                });
+
+                                                _displayTable();
+                                                $('#inp-scanner').val('');
+                                            } else {
+                                                item_detail.push({
+                                                    item_code: res[0].item_code,
+                                                    item_name: res[0].item_name,
+                                                    unit_code: res[0].unit_code,
+                                                    unit_name: res[0].unit_name,
+                                                    balance: 0.0,
+                                                    qty: 1
+                                                });
+                                                _displayTable();
+                                                $('#inp-scanner').val('');
+                                            }
+
+                                        },
+                                        error: function (res) {
+                                            console.log(res)
+                                        },
+                                    });
+
+                                } else {
+                                    swal("ไม่พบข้อมูลสินค้า", data, "warning")
+                                }
+
+                            },
+                            error: function (res) {
+                                console.log(res)
+                            },
+                        });
+                    }
+                } else {
+                    swal("พบสินค้าในรายการแล้ว", data, "warning")
+                }
+            }
+        }
+    });
 
     $('#btn_create').on('click', function () {
         var doc_no = $('#doc_no').val();
@@ -206,43 +320,61 @@ $(document).ready(function () {
         var index = $('#line_index').val()
         var detail = $('#line_action').val()
 
-        item_detail[index].item_code = code;
-        item_detail[index].item_name = name;
-        $.ajax({
-            url: serverURL + 'unit_item?code=' + code,
-            method: 'GET',
-            cache: false,
-            success: function (res) {
+        var row = item_detail.filter(
+                c => c.item_code == code
+        );
 
-                console.log(res)
-                if (res.length == 1) {
-                    item_detail[index].unit_code = res[0].code;
-                    item_detail[index].unit_name = res[0].name_1;
-                    _getCost(index, code, res[0].code);
-                } else {
-                    var html = '';
-                    for (var i = 0; i < res.length; i++) {
-                        html += "<li class = 'list-group-item list-group-item-action select-unit' data-itemcode='" + code + "'  data-code='" + res[i].code + "' data-name='" + res[i].name_1 + "' > " + res[i].code + '~' + res[i].name_1 + " </li>"
+        if (row.length == 0) {
+
+
+            item_detail[index].item_code = code;
+            item_detail[index].item_name = name;
+            $.ajax({
+                url: serverURL + 'unit_item?code=' + code,
+                method: 'GET',
+                cache: false,
+                success: function (res) {
+
+                    console.log(res)
+                    if (res.length == 1) {
+                        item_detail[index].unit_code = res[0].code;
+                        item_detail[index].unit_name = res[0].name_1;
+                        _getCost(index, code, res[0].code);
+                    } else {
+                        var html = '';
+                        for (var i = 0; i < res.length; i++) {
+                            html += "<li class = 'list-group-item list-group-item-action select-unit' data-itemcode='" + code + "'  data-code='" + res[i].code + "' data-name='" + res[i].name_1 + "' > " + res[i].code + '~' + res[i].name_1 + " </li>"
+                        }
+                        $('#list_unit_item').html(html)
+                        $('#modalSearch').modal('hide')
+                        setTimeout(function () {
+                            $('#modalUnit').modal('show')
+                        }, 500);
                     }
-                    $('#list_unit_item').html(html)
-                    $('#modalSearch').modal('hide')
-                    setTimeout(function () {
-                        $('#modalUnit').modal('show')
-                    }, 500);
-                }
 
-            },
-            error: function (res) {
-                console.log(res)
-            },
-        });
+                },
+                error: function (res) {
+                    console.log(res)
+                },
+            });
+        } else {
+            swal("พบสินค้าในรายการแล้ว", code, "warning")
+        }
     });
 
     $(document).delegate('.qty_edit', 'input', function (event) {
 
         var index = $(this).attr('data-index')
         var data = $('.qty_value_' + index).val();
-        item_detail[index].qty = data
+
+
+        if (parseFloat(data) > 0) {
+            item_detail[index].qty = data
+        } else {
+            item_detail[index].qty = 1
+        }
+
+        $('.qty_value_' + index).val(item_detail[index].qty);
 
     });
 
@@ -356,6 +488,8 @@ function _getDocDetail(docno) {
 
 function _getBranchList() {
 
+    var sess_branch = $('#session_branch_code').val();
+
     var html = "";
     $.ajax({
         url: serverURL + 'getBranchListUser',
@@ -375,6 +509,10 @@ function _getBranchList() {
                     $('#from_bh').select2({
                         theme: 'bootstrap'
                     })
+
+                    setTimeout(function () {
+                        $('#from_bh').val(sess_branch).trigger('change');
+                    }, 500)
                 }, 500)
             }
 
@@ -387,7 +525,7 @@ function _getBranchList() {
 }
 
 function _getToBranchList() {
-
+    var sess_branch = $('#session_to_branch_code').val();
     var html = "";
     $.ajax({
         url: serverURL + 'getToBranchListUser',
@@ -407,6 +545,9 @@ function _getToBranchList() {
                     $('#to_bh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        $('#to_bh').val(sess_branch).trigger('change');
+                    }, 500)
                 }, 500)
             }
 
@@ -419,6 +560,7 @@ function _getToBranchList() {
 }
 
 function _getWhList() {
+    var sess_wh = $('#session_wh_code').val();
 
     var html = "";
     $.ajax({
@@ -439,6 +581,15 @@ function _getWhList() {
                     $('#from_wh').select2({
                         theme: 'bootstrap'
                     })
+
+
+                    setTimeout(function () {
+                        console.log(sess_wh)
+                        $('#from_wh').val(sess_wh).trigger('change');
+
+                    }, 500)
+
+
                 }, 500)
             }
 
@@ -451,7 +602,7 @@ function _getWhList() {
 }
 
 function _getToWhList() {
-
+    var sess_wh = $('#session_to_wh_code').val();
     var html = "";
     $.ajax({
         url: serverURL + 'getToWhListUser',
@@ -471,6 +622,11 @@ function _getToWhList() {
                     $('#to_wh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        console.log(sess_wh)
+                        $('#to_wh').val(sess_wh).trigger('change');
+
+                    }, 500)
                 }, 500)
             }
 
@@ -484,6 +640,8 @@ function _getToWhList() {
 
 function _getShList() {
     var data = $('#from_wh').val();
+    var sess_sh = $('#session_shelf_code').val();
+
     var html = "";
     $.ajax({
         url: serverURL + 'getShListUser?whcode=' + data,
@@ -504,6 +662,10 @@ function _getShList() {
                     $('#from_sh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        $('#from_sh').val(sess_sh).trigger('change');
+                    }, 500)
+
                 }, 500)
 
             }
@@ -518,6 +680,7 @@ function _getShList() {
 
 function _getShList2() {
     var data = $('#to_wh').val();
+    var sess_sh = $('#session_to_shelf_code').val();
     var html = "";
     $.ajax({
         url: serverURL + 'getToShListUser?whcode=' + data,
@@ -538,6 +701,10 @@ function _getShList2() {
                     $('#to_sh').select2({
                         theme: 'bootstrap'
                     })
+                    setTimeout(function () {
+                        $('#to_sh').val(sess_sh).trigger('change');
+                    }, 500)
+
                 }, 500)
             }
 
@@ -561,7 +728,7 @@ function _getCost(index, itemcode, unitcode) {
         success: function (res) {
 
             console.log(res)
-            if (res.length == 1) {
+            if (res.length > 0) {
                 item_detail[index].balance = res[0].balance_qty
                 _displayTable();
                 $('#modalSearch').modal('hide')
@@ -616,7 +783,7 @@ function _addLine() {
         item_name: '',
         unit_code: '',
         balance: 0.0,
-        qty: 0.0
+        qty: 1
     });
     _displayTable();
 }
@@ -639,7 +806,10 @@ function _displayTable() {
         html += '<td class="text-left">' + item_detail[i].item_name + '</td>'
 
         html += '<td class="text-center">' + item_detail[i].unit_code + '</td>'
-        //html += '<td class="text-right " >' + formatNumber(parseFloat(item_detail[i].balance)) + '</td>'
+        if (show_balance == '1') {
+            html += '<td class="text-right " >' + formatNumber(parseFloat(item_detail[i].balance)) + '</td>'
+        }
+
         if (cmd_status == "0") {
             html += '<td class="text-center" ><input type="number" style="text-align:center" class="qty_edit  qty_value_' + i + '" data-index="' + i + '" value="' + item_detail[i].qty + '"></td>'
 

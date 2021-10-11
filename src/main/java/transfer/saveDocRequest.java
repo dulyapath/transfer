@@ -150,7 +150,7 @@ public class saveDocRequest extends HttpServlet {
             }
 
             _insert_trans_sale_temp.append("insert into ic_transfer_doc_temp (doc_no,doc_date,remark,user_code,wh_code,shelf_code,branch_code,to_wh_code,to_shelf_code,to_branch_code) "
-                    + "values ('" + __doc_no + "','" + __doc_date + "','" + __remark + "','" + __user_code + "','" + __from_wh + "','" + __from_sh + "','" + __from_bh + "','" + __to_wh + "','" + __to_sh + "','" + __to_bh + "')");
+                    + "values ('" + __doc_no + "','now()','" + __remark + "','" + __user_code + "','" + __from_wh + "','" + __from_sh + "','" + __from_bh + "','" + __to_wh + "','" + __to_sh + "','" + __to_bh + "')");
             System.out.println(_insert_trans_sale_temp.toString());
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);

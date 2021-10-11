@@ -93,12 +93,19 @@ $(document).ready(function () {
         var code = $(this).attr('data-docno')
         var status = $(this).attr('data-status')
 
+
         if (status == '2') {
 
             window.open('print.jsp' + "?docno=" + code, "_blank");
+
         } else {
-            window.open('../print/index.jsp' + "?docno=" + code, "_blank");
+            window.open('print_pre.jsp' + "?docno=" + code, "_blank");
         }
+
+        setTimeout(function () {
+            _getListData('');
+        }, 4000)
+
 
     });
 
@@ -199,11 +206,16 @@ function _showListDetail(data) {
             statusText = "ไม่อนุมัติ"
             color = "red";
         }
-
+        var txt_print = ""
+        if (data[i].is_print == '1' && data[i].status == "1") {
+            txt_print += "กำลังจัด"
+        }
+        var doc_time_split = data[i].doc_time.split(':')
+        var _doc_time = doc_time_split[0] + ":" + doc_time_split[1]
         html += `    <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                        <div class="text-header text-left">${data[i].doc_no} <span class="text-header text-right" style="color:${color}">${statusText}</span></div>
+                        <div class="text-header text-left">${data[i].doc_no} <span class="text-header text-right" style="color:${color}">${statusText}</span> <span class="text-header text-right" style="color:green">${txt_print}</span></div>
                     </div>
 
               
@@ -213,7 +225,7 @@ function _showListDetail(data) {
                         <div class="text-body text-left">วันที่ : ${data[i].doc_date}</div>
                     </div>
                     <div class="col-4">
-                        <div class="text-body text-left">เวลา : ${data[i].doc_time}</div>
+                        <div class="text-body text-left">เวลา : ${_doc_time}</div>
                     </div>
                     <div class="col-4">
                         <div class="text-body text-left">ผู้ขอ :  ${data[i].user_code}~${data[i].user_name}</div>
@@ -260,7 +272,7 @@ function _showListDetail(data) {
                             <span class="icon text-white-50">
                                 <i class="fas fa-file"></i>
                             </span>
-                            <span class="text">จัดสินค้า</span>
+                            <span class="text">จ่ายสินค้า</span>
                         </button>`
             html += ` <button  class="btn btn-info btn-icon-split show_detail" data-status="${data[i].status}" data-docno="${data[i].doc_no}">
                             <span class="icon text-white-50">
