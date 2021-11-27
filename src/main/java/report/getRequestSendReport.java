@@ -216,7 +216,7 @@ public class getRequestSendReport extends HttpServlet {
                 obj.put("cmd", __rsHead.getString("cmd"));
 
                 JSONArray jsarrz = new JSONArray();
-                String query2 = "select doc_no,wid_doc,coalesce(fg_doc,'') as fg_doc,coalesce(rim_doc,'')as rim_doc,(select count(*) from ic_transfer_detail_temp where doc_no = ic_transfer_doc_temp.doc_no) as item_count ,\n"
+                String query2 = "select doc_no,status,wid_doc,coalesce(fg_doc,'') as fg_doc,coalesce(rim_doc,'')as rim_doc,(select count(*) from ic_transfer_detail_temp where doc_no = ic_transfer_doc_temp.doc_no) as item_count ,\n"
                         + "(select sum(qty) from ic_transfer_detail_temp where ic_transfer_detail_temp.doc_no = ic_transfer_doc_temp.doc_no) as request_qty,\n"
                         + "(select sum(event_qty) from ic_transfer_detail_temp where ic_transfer_detail_temp.doc_no = ic_transfer_doc_temp.doc_no) as send_qty,\n"
                         + "(select sum(receive_qty) from ic_transfer_detail_temp where ic_transfer_detail_temp.doc_no = ic_transfer_doc_temp.doc_no) as rec_qty,\n"
@@ -250,6 +250,7 @@ public class getRequestSendReport extends HttpServlet {
                     objz.put("rec_qty", __rsHead2.getString("rec_qty"));
                     objz.put("wait_rim_qty", __rsHead2.getString("wait_rim_qty"));
                     objz.put("rim_qty", __rsHead2.getString("rim_qty"));
+                    objz.put("status", __rsHead2.getString("status"));
 
                     Double wait_receive_qty = 0.00;
                     wait_receive_qty = (Double.parseDouble(__rsHead2.getString("send_qty")) - Double.parseDouble(__rsHead2.getString("rec_qty")) - Double.parseDouble(__rsHead2.getString("wait_rim_qty")) - Double.parseDouble(__rsHead2.getString("rim_qty")));

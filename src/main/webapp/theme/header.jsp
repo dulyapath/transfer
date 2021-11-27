@@ -204,7 +204,15 @@
                         <i class="fas fa-file"></i>
                         <span>รายงานขอเบิก-เบิกสินค้า</span></a>
                 </li>
-
+                <% if (active == "reportrequestsenditem") { %>
+                <li class="nav-item active">
+                    <% } else { %>
+                <li class="nav-item ">
+                    <% }%>
+                    <a class="nav-link" href="${sublink}reportrequestsenditem/index.jsp">
+                        <i class="fas fa-file"></i>
+                        <span>รายงานการโอนตามสินค้า</span></a>
+                </li>
                 <%
 
                     if (is_del_history != null || user_code.equals("SUPERADMIN")) {

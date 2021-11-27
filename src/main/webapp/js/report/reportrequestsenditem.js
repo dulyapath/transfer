@@ -428,6 +428,7 @@ function _getShList2() {
 function _getListData(data) {
 
     var search = $('#search').val();
+    var itemcode = $('#itemcode').val();
     var doc_status = $('#doc_status').val();
     var req_from_date = $('#req_from_date').val();
     var req_to_date = $('#req_to_date').val();
@@ -441,7 +442,7 @@ function _getListData(data) {
     var to_shelf_code = $('#to_shelf_code').val();
 
     $.ajax({
-        url: serverURL + 'getRequestSendReport?docst=' + doc_status + '&search=' + search.trim() + '&rfd=' + req_from_date + '&rtd=' + req_to_date + '&sfd=' + send_from_date + '&std=' + send_to_date + '&fbc=' + from_branch_code + '&fwc=' + from_wh_code + '&fsc=' + from_shelf_code
+        url: serverURL + 'getRequestSendByitemReport?item=' + itemcode + '&docst=' + doc_status + '&search=' + search.trim() + '&rfd=' + req_from_date + '&rtd=' + req_to_date + '&sfd=' + send_from_date + '&std=' + send_to_date + '&fbc=' + from_branch_code + '&fwc=' + from_wh_code + '&fsc=' + from_shelf_code
                 + '&tbc=' + to_branch_code + '&twc=' + to_wh_code + '&tsc=' + to_shelf_code,
         method: 'GET',
         cache: false,
@@ -468,8 +469,7 @@ function _showListDetail(data) {
         var doc_status = "0";
         var statusText = "";
         var color = "blue";
-        html += ` <tr>
-                        <td><button style="vertical-align : middle;text-align:center;" class="btn btn-warning btn-sm btn_detail" linenumber=${i}>Detail</button></td>`
+        html += ` <tr>`
         if (data[i].is_direct == '1') {
             html += ` <td></td>`
             html += ` <td></td>`
@@ -477,78 +477,45 @@ function _showListDetail(data) {
             html += ` <td>${data[i].doc_no}</td>`
             html += ` <td>${data[i].doc_date}</td>`
         }
-        var a_sum_qty = 0;
-        var a_sum_event_qty = 0;
-        var a_sum_re_qty = 0;
-        var a_sum_turn_qty = 0;
-        var a_sum_wait_rec = 0;
-        var a_sum_wait_return = 0;
-        for (var z = 0; z < data[i].detail.length; z++) {
-            var x_sum_qty = 0;
-            var x_sum_event_qty = 0;
-            var x_sum_re_qty = 0;
-            var x_sum_turn_qty = 0;
-            var x_sum_wait_rec = 0;
-            var x_sum_wait_return = 0;
 
-            for (var x = 0; x < data[i].detail[z].detail.length; x++) {
-                x_sum_qty += parseFloat(data[i].detail[z].detail[x].qty)
-                x_sum_event_qty += parseFloat(data[i].detail[z].detail[x].event_qty)
-                x_sum_re_qty += parseFloat(data[i].detail[z].detail[x].receive_qty)
-                x_sum_turn_qty += parseFloat(data[i].detail[z].detail[x].return_qty)
-                x_sum_wait_rec += (parseFloat(data[i].detail[z].detail[x].event_qty) - parseFloat(data[i].detail[z].detail[x].receive_qty) - parseFloat(data[i].detail[z].detail[x].wait_return_qty) - parseFloat(data[i].detail[z].detail[x].return_qty))
-                x_sum_wait_return += parseFloat(data[i].detail[z].detail[x].wait_return_qty)
-            }
-
-            a_sum_qty += x_sum_qty
-            a_sum_event_qty += x_sum_event_qty
-            a_sum_re_qty += x_sum_re_qty
-            a_sum_turn_qty += x_sum_turn_qty
-            a_sum_wait_rec += x_sum_wait_rec
-            a_sum_wait_return += x_sum_wait_return
-        }
-        if (a_sum_qty == 0) {
-            a_sum_qty = "";
-        }
-        if (a_sum_event_qty == 0) {
-            a_sum_event_qty = "";
-        }
-        if (a_sum_re_qty == 0) {
-            a_sum_re_qty = "";
-        }
-        if (a_sum_turn_qty == 0) {
-            a_sum_turn_qty = "";
-        }
-        if (a_sum_wait_rec == 0) {
-            a_sum_wait_rec = "";
-        }
-        if (a_sum_wait_return == 0) {
-            a_sum_wait_return = "";
-        }
-        html += `<td>${data[i].wid_doc}</td>`
         if (data[i].wid_date_format == undefined) {
-            html += `<td nowrap></td>
-<td nowrap></td>`
+            html += `<td>รออนุมัติ</td>`
+            html += `<td></td>`
         } else {
-            html += `<td nowrap>${data[i].wid_date_format}</td>
-<td nowrap>${data[i].wid_creator_name}(${data[i].wid_creator_code})</td>`
-        }
+            html += `<td>${data[i].wid_date_format}</td>`
+            html += `<td>${data[i].wid_doc}</td>`
 
+        }
+        if (data[i].fg_doc == '') {
+            html += `<td nowrap></td>`
+        } else {
+            html += `<td nowrap>${data[i].fg_doc}</td>`
+        }
+        if (data[i].rim_doc == '') {
+            html += `<td nowrap></td>`
+        } else {
+            html += `<td nowrap>${data[i].rim_doc}</td>`
+        }
+        if (data[i].wid_creator_code == undefined) {
+            html += `<td nowrap></td>`
+        } else {
+            html += `<td nowrap>${data[i].wid_creator_name}(${data[i].wid_creator_code})</td>`
+        }
+        html += `<td nowrap>${data[i].item_code}~${data[i].item_name}</td>`
         html += `
                         <td nowrap>${data[i].branch_name}(${data[i].branch_code})</td>
                         <td nowrap>${data[i].wh_name}(${data[i].wh_code})</td>
                         <td nowrap>${data[i].shelf_name}(${data[i].shelf_code})</td>
                         <td nowrap>${data[i].to_branch_name}(${data[i].to_branch_code})</td>
                         <td nowrap>${data[i].to_wh_name}(${data[i].to_wh_code})</td>
-                        <td nowrap>${data[i].to_shelf_name}(${data[i].to_shelf_code})</td>
-                        <td class="text-right">${data[i].list_item}</td>`
+                        <td nowrap>${data[i].to_shelf_name}(${data[i].to_shelf_code})</td>`
         html += `<td class="text-right">${data[i].request_qty}</td>`
         html += `<td class="text-right">${data[i].send_qty}</td>`
-        html += `<td class="text-right">${data[i].total_receive_qty}</td>
-              <td class="text-right">${data[i].total_return_qty}</td>
-                        <td class="text-right">${data[i].total_wait_return_qty}</td>
+        html += `<td class="text-right">${data[i].receive_qty}</td>
+              <td class="text-right">${data[i].return_qty}</td>
+                        <td class="text-right">${data[i].wait_return_qty}</td>
                   
-                        <td class="text-right">${data[i].total_wait_receive}</td>`
+                        <td class="text-right">${data[i].wait_receive_qty}</td>`
 
 
         if (data[i].doc_status == '1') {
@@ -562,101 +529,6 @@ function _showListDetail(data) {
 
 
         html += `</tr>`;
-
-        for (var z = 0; z < data[i].detail.length; z++) {
-            var doc_nox = ""
-            if (data[i].detail[z].wid_doc == data[i].detail[z].doc_no) {
-                doc_nox = '<span style="color:red">ไม่มีใบขอ</span>';
-            } else {
-                doc_nox = data[i].detail[z].doc_no;
-            }
-            html += `<tr class="detail_item_${i} detail2" style="background-color: #ff9933;display:none">
-                        <td></td>`
-
-            var statuswait = '';
-            if (data[i].detail[z].status.toString() == "6") {
-                statuswait = '(รออนุมัติ)'
-            }
-            html += `<td colspan="11"><span>เลขที่ใบขอ:<b>${doc_nox}</b></span><span style='margin-left:15px'>เลขที่ใบเบิก:<b style='cursor:pointer'>${data[i].detail[z].wid_doc}</b>  <b>${statuswait}</b></span><span style='margin-left:15px'>เลขที่ใบรับ:<b style='cursor:pointer'>${data[i].detail[z].fg_doc}</b></span><span style='margin-left:15px'>เลขที่ใบคืน:<b style='cursor:pointer'>${data[i].detail[z].rim_doc}</b></span> </td>`
-            var sum_qty = 0;
-            var sum_event_qty = 0;
-            var sum_re_qty = 0;
-            var sum_turn_qty = 0;
-            var sum_wait_rec = 0;
-            var sum_wait_return = 0;
-            for (var x = 0; x < data[i].detail[z].detail.length; x++) {
-                sum_qty += parseFloat(data[i].detail[z].detail[x].qty)
-                sum_event_qty += parseFloat(data[i].detail[z].detail[x].event_qty)
-                sum_re_qty += parseFloat(data[i].detail[z].detail[x].receive_qty)
-                sum_turn_qty += parseFloat(data[i].detail[z].detail[x].return_qty)
-                sum_wait_rec += (parseFloat(data[i].detail[z].detail[x].event_qty) - parseFloat(data[i].detail[z].detail[x].receive_qty) - parseFloat(data[i].detail[z].detail[x].wait_return_qty) - parseFloat(data[i].detail[z].detail[x].return_qty))
-                sum_wait_return += parseFloat(data[i].detail[z].detail[x].wait_return_qty)
-            }
-            if (sum_qty == 0) {
-                sum_qty = ""
-            }
-            if (sum_event_qty == 0) {
-                sum_event_qty = ""
-            }
-            if (sum_turn_qty == 0) {
-                sum_turn_qty = ""
-            }
-            if (sum_wait_return == 0) {
-                sum_wait_return = ""
-            }
-            if (sum_wait_rec == 0) {
-                sum_wait_rec = ""
-            }
-            html += `<td class='text-right'>${data[i].detail[z].item_count}</td>
-                        <td class='text-right'>${data[i].detail[z].request_qty}</td>
-                        <td class='text-right'>${data[i].detail[z].send_qty}</td>
-                        <td class='text-right'>${data[i].detail[z].rec_qty}</td>
-                        <td class='text-right'>${data[i].detail[z].rim_qty}</td>
-                        <td class='text-right'>${data[i].detail[z].wait_rim_qty}</td>
-                        <td class='text-right'>${data[i].detail[z].wait_receive_qty}</td>
-                        <td></td>
-                    </tr>`
-            for (var x = 0; x < data[i].detail[z].detail.length; x++) {
-                var show_qty = ""
-                var show_event_qty = ""
-                var show_receive_qty = ""
-                var show_return_qty = ""
-                var show_wait_return_qty = ""
-                var show_wait_receive_qty = "";
-                if (data[i].detail[z].detail[x].qty != '0') {
-                    show_qty = data[i].detail[z].detail[x].qty;
-                }
-                if (data[i].detail[z].detail[x].event_qty != '0') {
-                    show_event_qty = data[i].detail[z].detail[x].event_qty;
-                }
-                if (data[i].detail[z].detail[x].receive_qty != '0') {
-                    show_receive_qty = data[i].detail[z].detail[x].receive_qty
-                }
-                if (data[i].detail[z].detail[x].return_qty != '0') {
-                    show_return_qty = data[i].detail[z].detail[x].return_qty
-                }
-                if (data[i].detail[z].detail[x].wait_return_qty != '0') {
-                    show_wait_return_qty = data[i].detail[z].detail[x].wait_return_qty
-                }
-                if ((parseFloat(data[i].detail[z].detail[x].event_qty) - parseFloat(data[i].detail[z].detail[x].wait_return_qty) - parseFloat(data[i].detail[z].detail[x].return_qty) - parseFloat(data[i].detail[z].detail[x].receive_qty)) != 0) {
-                    show_wait_receive_qty = (parseFloat(data[i].detail[z].detail[x].event_qty) - parseFloat(data[i].detail[z].detail[x].wait_return_qty) - parseFloat(data[i].detail[z].detail[x].return_qty) - parseFloat(data[i].detail[z].detail[x].receive_qty));
-                }
-
-                html += `<tr class="detail_item_${i} detail2" style="background-color: #ffffcc;display:none">
-                        <td></td>
-                        <td colspan="12">${data[i].detail[z].detail[x].item_code}~${data[i].detail[z].detail[x].item_name}</td>
-                      
-                        <td class='text-right'>${show_qty}</td>
-                        <td class='text-right'>${show_event_qty}</td>
-                        <td class='text-right'>${show_receive_qty}</td>
-                        <td class='text-right'>${show_return_qty}</td>
-                        <td class='text-right'>${show_wait_return_qty}</td>
-                        <td class='text-right'>${show_wait_receive_qty}</td>
-                      <td></td>
-    </tr>`
-            }
-        }
-
     }
 
     $('#show_list_detail').html(html);
